@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+
 
 class UserController extends Controller
 {
@@ -37,9 +39,11 @@ class UserController extends Controller
             'email' => 'required|email|unique:users',
             'password' => 'required|min:6'
         ]);
-
-        $user = User::create($request->all());
-
+        $user = new User();
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->password = Hash::make($request->password);
+        $user->save();
         return response()->json($user, 201);
 
     }
@@ -48,8 +52,10 @@ class UserController extends Controller
     public function update($id, Request $request)
     {
         $user = User::findOrFail($id);
-        $user->update($request->all());
-
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->password = Hash::make($request->password);
+        $user->save();
         return response()->json($user, 200);
     }
 
