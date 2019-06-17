@@ -44,5 +44,9 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->post('assignTeam',  ['uses' => 'ActionController@assignTeam']);
     $router->post('assignRole',  ['uses' => 'ActionController@assignRole']);
 
+    $router->post('unAssignTeam',  ['uses' => 'ActionController@unAssignTeam']);
+    $router->post('unAssignRole',  ['uses' => 'ActionController@unAssignRole']);
+    $router->post('setOwner',  ['uses' => 'ActionController@setOwner']);
+
 
 });

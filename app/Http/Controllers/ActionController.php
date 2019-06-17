@@ -44,4 +44,14 @@ class ActionController extends Controller
 
         return response()->json('User Successfully assigned to Team', 200);
     }
+
+    public function setOwner(Request $request){
+        $user = User::findOrfail($request->user_id);
+        $team =Team::findOrfail($request->team_id);
+        $team->owner = $user->id;
+        $team->save();
+
+        return response()->json('User Successfully assigned to Team', 200);
+    }
+
 }

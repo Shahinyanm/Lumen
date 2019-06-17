@@ -15,18 +15,6 @@ class RoleTest extends testCase
         $this->get('api/roles', []);
         $this->seeStatusCode(200);
         $this->seeJson();
-//        $this->seeJsonStructure(
-//            ['*' => ['*' =>
-//                [
-//                    'id',
-//                    'name',
-//                    'email',
-//                    'created_at',
-//                    'updated_at',
-//                ]
-//            ]
-//            ]
-//        );
         $this->assertTrue(true);
     }
 
@@ -35,17 +23,7 @@ class RoleTest extends testCase
         $this->get('api/roles/1', []);
         $this->seeStatusCode(200);
         $this->assertTrue(true);
-//        $this->seeJsonStructure(
-//            ['data' =>
-//                [
-//                    'id',
-//                    'name',
-//                    'email',
-//                    'created_at',
-//                    'updated_at',
-//                ]
-//            ]
-//        );
+
     }
 
     public function testroleCreate()
