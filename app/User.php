@@ -29,4 +29,12 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     protected $hidden = [
         'password',
     ];
+
+    public function teams(){
+        return $this->belongsToMany(Team::class);
+    }
+
+    public function roles(){
+        return $this->belongsToMany(Role::class);
+    }
 }
