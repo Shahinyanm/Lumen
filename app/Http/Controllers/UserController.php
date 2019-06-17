@@ -23,13 +23,13 @@ class UserController extends Controller
     public function showAllUsers()
     {
 
-        return response()->json(User::all());
+        return response()->json(User::all(),200);
     }
 
     public function show($id)
     {
 
-        return response()->json(User::findOrFail($id));
+        return response()->json(User::findOrFail($id),200);
     }
 
     public function create(Request $request)
