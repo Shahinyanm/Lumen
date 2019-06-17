@@ -51,7 +51,7 @@ class ActionController extends Controller
         $team->owner = $user->id;
         $team->save();
 
-        return response()->json('User Successfully assigned to Team', 200);
+        return response()->json('Now '.$team->title.' Owner is '.$user->name, 200);
     }
 
 }

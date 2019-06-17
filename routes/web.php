@@ -17,7 +17,7 @@ $router->get('/', function () use ($router) {
 
 
 
-$router->group(['prefix' => 'api'], function () use ($router) {
+$router->group(['prefix' => 'api','middleware'=>'client'], function () use ($router) {
     //users Routes
     $router->get('users',  ['uses' => 'UserController@showAllUsers']);
     $router->get('users/{id}', ['uses' => 'UserController@show']);

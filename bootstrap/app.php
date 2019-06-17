@@ -24,6 +24,8 @@ $app = new Laravel\Lumen\Application(
  $app->withFacades();
 
  $app->withEloquent();
+$app->configure('auth');
+
 /*
 |--------------------------------------------------------------------------
 | Register Container Bindings
@@ -44,7 +46,9 @@ $app->singleton(
     Illuminate\Contracts\Console\Kernel::class,
     App\Console\Kernel::class
 );
-
+$app->bind(\Illuminate\Contracts\Routing\UrlGenerator::class, function ($app) {
+    return new \Laravel\Lumen\Routing\UrlGenerator($app);
+});
 /*
 |--------------------------------------------------------------------------
 | Register Middleware
@@ -60,9 +64,10 @@ $app->singleton(
 //     App\Http\Middleware\ExampleMiddleware::class
 // ]);
 
-// $app->routeMiddleware([
-//     'auth' => App\Http\Middleware\Authenticate::class,
-// ]);
+ $app->routeMiddleware([
+     'auth' => App\Http\Middleware\Authenticate::class,
+     'client' => \Laravel\Passport\Http\Middleware\CheckClientCredentials::class,
+ ]);
 
 /*
 |--------------------------------------------------------------------------
@@ -79,6 +84,10 @@ $app->singleton(
 // $app->register(App\Providers\AuthServiceProvider::class);
 // $app->register(App\Providers\EventServiceProvider::class);
 $app->register(Flipbox\LumenGenerator\LumenGeneratorServiceProvider::class);
+$app->register(Laravel\Passport\PassportServiceProvider::class);
+$app->register(Dusterio\LumenPassport\PassportServiceProvider::class);
+
+Dusterio\LumenPassport\LumenPassport::routes($app->router, ['prefix' => 'api/oauth'] );
 /*
 |--------------------------------------------------------------------------
 | Load The Application Routes
