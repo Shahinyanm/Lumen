@@ -15,10 +15,12 @@ $router->get('/', function () use ($router) {
     return $router->app->version();
 });
 
-$router->post('login',['uses' => 'AuthController@login']);
-$router->post('register',['uses' => 'AuthController@register']);
+$router->post('api/login',['uses' => 'AuthController@login']);
+$router->post('api/register',['uses' => 'AuthController@register']);
 
 $router->group(['prefix' => 'api','middleware'=>'auth'], function () use ($router) {
+    $router->post('logout',['uses' => 'AuthController@logout']);
+
     //users Routes
     $router->get('users',  ['uses' => 'UserController@showAllUsers']);
     $router->get('users/{id}', ['uses' => 'UserController@show']);
