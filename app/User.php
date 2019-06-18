@@ -7,12 +7,14 @@ use Laravel\Lumen\Auth\Authorizable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
-use Laravel\Passport\HasApiTokens;
+//use Laravel\Passport\HasApiTokens;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
 
-class User extends Model implements AuthenticatableContract, AuthorizableContract
+
+class User extends Model implements AuthenticatableContract, AuthorizableContract,JWTSubject
 {
-    use Authenticatable, Authorizable, HasApiTokens;
+    use Authenticatable, Authorizable;
 
     /**
      * The attributes that are mass assignable.
@@ -38,5 +40,20 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
 
     public function roles(){
         return $this->belongsToMany(Role::class,'user_roles','user_id','role_id');
+    }
+
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+
+    /**
+     * Return a key value array, containing any custom claims to be added to the JWT.
+     *
+     * @return array
+     */
+    public function getJWTCustomClaims()
+    {
+        return [];
     }
 }

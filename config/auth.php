@@ -5,9 +5,10 @@ return [
         'passwords' => 'users',
     ],
 
+
     'guards' => [
         'api' => [
-            'driver' => 'passport',
+            'driver' => 'jwt',
             'provider' => 'users',
         ],
     ],
