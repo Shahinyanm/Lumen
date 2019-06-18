@@ -14,43 +14,40 @@ class UserController extends Controller
      *
      * @return void
      */
-    public function __construct()
-    {
-        //
-    }
-
+    public function __construct(){}
 
     public function showAllUsers()
     {
-
         return response()->json(User::all(),200);
     }
 
     public function show($id)
     {
-
         return response()->json(User::findOrFail($id),200);
     }
 
-    public function create(Request $request)
-    {
-        $this->validate($request, [
-            'name' => 'required',
-            'email' => 'required|email|unique:users',
-            'password' => 'required|min:6'
-        ]);
-        $user = new User();
-        $user->name = $request->name;
-        $user->email = $request->email;
-        $user->password = Hash::make($request->password);
-        $user->save();
-        return response()->json($user, 201);
-
-    }
+//    public function create(Request $request)
+//    {
+//        $this->validate($request, [
+//            'name' => 'required',
+//            'email' => 'required|email|unique:users',
+//            'password' => 'required|min:6'
+//        ]);
+//        $user = new User();
+//        $user->name = $request->name;
+//        $user->email = $request->email;
+//        $user->password = Hash::make($request->password);
+//        $user->save();
+//        return response()->json($user, 201);
+//
+//    }
 
 
     public function update($id, Request $request)
     {
+        if($id  != \Auth::id()){
+            return  response()->json(['failed','You can not edit other users'], 401);
+        }
         $user = User::findOrFail($id);
         $user->name = $request->name;
         $user->email = $request->email;
@@ -61,6 +58,9 @@ class UserController extends Controller
 
     public function delete($id)
     {
+        if($id  != \Auth::id()){
+            return  response()->json(['failed','You can not edit other users'], 401);
+        }
         User::findOrFail($id)->delete();
         return response('Deleted Successfully', 200);
     }

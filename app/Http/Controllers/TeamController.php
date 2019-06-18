@@ -26,6 +26,7 @@ class TeamController extends Controller
         $teams = Team::with('users', 'owner')->whereHas('users', function ($u) {
             return $u->where('user_id', \Auth::id());
         })->orWhere('owner', \Auth::id())->get();
+
         return response()->json($teams);
     }
 

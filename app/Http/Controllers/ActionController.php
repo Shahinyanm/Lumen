@@ -12,7 +12,10 @@ class ActionController extends Controller
     public function assignTeam(Request $request){
 
         $user = User::findOrfail($request->user_id);
-        $team = Team::findOrfail($request->team_id);
+        $team = Team::findOrfail($request->team_id)->where('owner',\Auth::id())->first();
+        if(!$team){
+            return response()->json('You can not assign users to this team, because you are not owner', 200);
+        }
         $team->users()->sync($user);
 
         return response()->json('User Successfully assigned to Team', 200);
