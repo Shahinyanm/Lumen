@@ -13,11 +13,9 @@ class Team extends Model
 
     public function users()
     {
-        return $this->belongsToMany(User::class,'user_teams','team_id','user_id');
+        return $this->belongsToMany(User::class,'user_teams','team_id','user_id')->withPivot('owner');
     }
 
-    public function owner(){
-        return $this->belongsTo(User::class,'owner');
-    }
+
 
 }

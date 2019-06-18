@@ -12,11 +12,21 @@ class ActionController extends Controller
     public function assignTeam(Request $request){
 
         $user = User::findOrfail($request->user_id);
-        $team = Team::findOrfail($request->team_id)->where('owner',\Auth::id())->first();
-        if(!$team){
-            return response()->json('You can not assign users to this team, because you are not owner', 200);
+        $team = Team::with('users')->where('id',$request->team_id)->first();
+        $pivot =$team->users->find(\Auth::id())->pivot;
+
+
+        if(!$pivot->owner){
+            return response()->json('You can not assign users to this team, because you are not owner', 401);
         }
-        $team->users()->sync($user);
+        $old =$team->users->find($user->id,$team->id);
+
+        if(!$old){
+            $team->users()->attach($user);
+        }else{
+            return response()->json('User is already assigned team', 200);
+
+        }
 
         return response()->json('User Successfully assigned to Team', 200);
     }
@@ -33,7 +43,7 @@ class ActionController extends Controller
     public function unAssignTeam(Request $request){
 
         $user = User::findOrfail($request->user_id);
-        $team = Team::findOrfail($request->team_id)->where('owner',\Auth::id())->first();
+        $team = Team::where('id',$request->team_id)->where('owner',\Auth::id())->first();
         if(!$team){
             return response()->json('You can not un assign users to this team, because you are not owner', 200);
         }
@@ -54,7 +64,7 @@ class ActionController extends Controller
 
     public function setOwner(Request $request){
         $user = User::findOrfail($request->user_id);
-        $team = Team::findOrfail($request->team_id)->where('owner',\Auth::id())->first();
+        $team = Team::where('id',$request->team_id)->where('owner',\Auth::id())->first();
         if(!$team){
             return response()->json('You can not set owner to this team, because it is not your team', 200);
         }

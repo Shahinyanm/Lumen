@@ -35,16 +35,14 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     ];
 
     public function teams(){
-        return $this->belongsToMany(Team::class,'user_teams','user_id','team_id');
+        return $this->belongsToMany(Team::class,'user_teams','user_id','team_id')->withPivot('owner');
     }
 
     public function roles(){
         return $this->belongsToMany(Role::class,'user_roles','user_id','role_id');
     }
 
-    public function ownTeam(){
-        return $this->hasMany(Team::class,'owner');
-    }
+
 
     public function getJWTIdentifier()
     {

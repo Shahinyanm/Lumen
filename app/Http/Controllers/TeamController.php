@@ -50,11 +50,11 @@ class TeamController extends Controller
         $this->validate($request, [
             'title' => 'required',
         ]);
-
         $team = new Team();
         $team->title = $request->title;
-        $team->owner = \Auth::id();
         $team->save();
+        \Auth::user()->teams()->attach($team,['owner'=>true]);
+
 
         return response()->json($team, 201);
 

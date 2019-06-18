@@ -47,7 +47,7 @@ class ActionTest extends TestCase
             'user_id' => $user->id
         ];
         $this->post('api/assignRole', $parametr, $this->headers($user));
-        $this->seeStatusCode(200);
+        $this->seeStatusCode(401);
         $this->seeJson();
         $this->assertTrue(true);
     }
