@@ -3,7 +3,7 @@
 use Laravel\Lumen\testing\DatabaseMigrations;
 use Laravel\Lumen\testing\DatabaseTransactions;
 
-class Usertest extends testCase
+class Usertest extends TestCase
 {
     /**
      * A basic test example.
@@ -15,18 +15,7 @@ class Usertest extends testCase
         $this->get('api/users', []);
         $this->seeStatusCode(200);
         $this->seeJson();
-//        $this->seeJsonStructure(
-//            ['*' => ['*' =>
-//                [
-//                    'id',
-//                    'name',
-//                    'email',
-//                    'created_at',
-//                    'updated_at',
-//                ]
-//            ]
-//            ]
-//        );
+
         $this->assertTrue(true);
     }
 
@@ -35,17 +24,7 @@ class Usertest extends testCase
         $this->get('api/users/1', []);
         $this->seeStatusCode(200);
         $this->assertTrue(true);
-//        $this->seeJsonStructure(
-//            ['data' =>
-//                [
-//                    'id',
-//                    'name',
-//                    'email',
-//                    'created_at',
-//                    'updated_at',
-//                ]
-//            ]
-//        );
+
     }
 
     public function testCreate()

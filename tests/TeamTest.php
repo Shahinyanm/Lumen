@@ -3,7 +3,7 @@
 use Laravel\Lumen\testing\DatabaseMigrations;
 use Laravel\Lumen\testing\DatabaseTransactions;
 
-class TeamTest extends testCase
+class TeamTest extends TestCase
 {
     /**
      * A basic test example.

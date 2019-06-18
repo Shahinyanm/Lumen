@@ -3,7 +3,7 @@
 use Laravel\Lumen\testing\DatabaseMigrations;
 use Laravel\Lumen\testing\DatabaseTransactions;
 
-class RoleTest extends testCase
+class RoleTest extends TestCase
 {
     /**
      * A basic test example.
