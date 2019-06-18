@@ -9,21 +9,25 @@ use Illuminate\Http\Request;
 
 class ActionController extends Controller
 {
-    public function assignTeam(Request $request){
+    public function assignTeam(Request $request)
+    {
 
         $user = User::findOrfail($request->user_id);
-        $team = Team::with('users')->where('id',$request->team_id)->first();
-        $pivot =$team->users->find(\Auth::id())->pivot;
+        $team = Team::with('users')->where('id', $request->team_id)->first();
+        if (!$team) {
+            return response()->json('Wrong Team ID', 401);
+        }
+        $pivot = optional($team->users->find(\Auth::id()))->pivot;
 
 
-        if(!$pivot->owner){
+        if (!$pivot || !$pivot->owner) {
             return response()->json('You can not assign users to this team, because you are not owner', 401);
         }
 
-        $old =$team->users->find($user->id);
-        if(!$old){
+        $old = $team->users->find($user->id);
+        if (!$old) {
             $team->users()->attach($user);
-        }else{
+        } else {
             return response()->json('User is already assigned team', 200);
 
         }
@@ -32,7 +36,8 @@ class ActionController extends Controller
     }
 
 
-    public function assignRole(Request $request){
+    public function assignRole(Request $request)
+    {
         $user = User::findOrfail($request->user_id);
         $role = Role::findOrfail($request->role_id);
         $role->users()->sync($user);
@@ -40,11 +45,12 @@ class ActionController extends Controller
         return response()->json('User Successfully assigned to Team', 200);
     }
 
-    public function unAssignTeam(Request $request){
+    public function unAssignTeam(Request $request)
+    {
 
         $user = User::findOrfail($request->user_id);
-        $team = Team::where('id',$request->team_id)->where('owner',\Auth::id())->first();
-        if(!$team){
+        $team = Team::where('id', $request->team_id)->where('owner', \Auth::id())->first();
+        if (!$team) {
             return response()->json('You can not un assign users to this team, because you are not owner', 200);
         }
         $team->users()->detach($user);
@@ -53,7 +59,8 @@ class ActionController extends Controller
     }
 
 
-    public function unAssignRole(Request $request){
+    public function unAssignRole(Request $request)
+    {
         $user = User::findOrfail($request->user_id);
         $role = Role::findOrfail($request->role_id);
 
@@ -62,16 +69,29 @@ class ActionController extends Controller
         return response()->json('User Successfully assigned to Team', 200);
     }
 
-    public function setOwner(Request $request){
+    public function setOwner(Request $request)
+    {
         $user = User::findOrfail($request->user_id);
-        $team = Team::where('id',$request->team_id)->where('owner',\Auth::id())->first();
-        if(!$team){
-            return response()->json('You can not set owner to this team, because it is not your team', 200);
+        $team = Team::with('users')->where('id', $request->team_id)->first();
+        if (!$team) {
+            return response()->json('Wrong Team ID', 401);
         }
-        $team->owner = $user->id;
-        $team->save();
+        $pivot = $team->users->find(\Auth::id())->pivot;
 
-        return response()->json('Now '.$team->title.' Owner is '.$user->name, 200);
+
+        if (!$pivot->owner) {
+            return response()->json('You can not assign users to this team, because you are not owner', 401);
+        }
+        $old = optional($team->users->find($user->id))->pivot;
+        if (!$old || !$old->owner) {
+            $team->users()->attach($user, ['owner' => true]);
+        } else {
+            return response()->json('User is already owner of this team', 200);
+
+        }
+
+
+        return response()->json('Now ' . $team->title . ' Owner is ' . $user->name, 200);
     }
 
 }
