@@ -11,12 +11,15 @@ class UserTest extends TestCase
      *
      * @return void
      */
+
     public function testShowAllUsers()
     {
-       $user = \Tymon\JWTAuth\Facades\JWTAuth::shouldReceive('parseToken->authenticate')
-            ->andReturn(\Auth::user());
-
-        $this->get('api/users', []);
+        $user =\App\User::create([
+            'name'=> 'Test',
+            'email'=> 'Test@example.com',
+            'password'=> 'secret',
+        ]);
+        $this->get('api/users', $this->headers($user));
         $this->seeStatusCode(200);
 //        $this->seeJson();
 
@@ -25,7 +28,12 @@ class UserTest extends TestCase
 
     public function testShow()
     {
-        $this->get('api/users/1', []);
+        $user =\App\User::create([
+            'name'=> 'Test',
+            'email'=> 'Test@example.com',
+            'password'=> 'secret',
+        ]);
+        $this->get('api/users/1',  $this->headers($user));
         $this->seeStatusCode(200);
         $this->assertTrue(true);
 
@@ -46,22 +54,30 @@ class UserTest extends TestCase
 
     public function testUpdate()
     {
+        $user =\App\User::create([
+            'name'=> 'Test',
+            'email'=> 'Test@example.com',
+            'password'=> 'secret',
+        ]);
         $parameters = [
             "name" => "Newtest",
             "email" => "Newtest@test.com",
             "password" => "secret"
         ];
-        $this->put("api/users/1", $parameters, []);
+        $this->put("api/users/1", $parameters,  $this->headers($user));
         $this->seeStatusCode(200);
         $this->seeInDatabase('users', ['email' => 'Newtest', 'email' => 'Newtest@test.com']);
-        $this->assertJson($parameters);
 
     }
 
     public function testDestroy()
     {
-
-        $this->delete("api/users/11", [], []);
+        $user =\App\User::create([
+            'name'=> 'Test',
+            'email'=> 'Test@example.com',
+            'password'=> 'secret',
+        ]);
+        $this->delete("api/users/".$user->id, [],  $this->headers($user));
         $this->seeStatusCode(200);
         $this->assertTrue(true);
     }

@@ -5,6 +5,7 @@ use Laravel\Lumen\testing\DatabaseTransactions;
 
 class TeamTest extends TestCase
 {
+    use DatabaseMigrations;
     /**
      * A basic test example.
      *
@@ -12,29 +13,41 @@ class TeamTest extends TestCase
      */
     public function testShowAllTeams()
     {
-        $this->get('api/teams', []);
+        $user =\App\User::create([
+            'name'=> 'Test',
+            'email'=> 'Test@example.com',
+            'password'=> 'secret',
+        ]);
+        $this->get('api/teams', [],$this->headers($user));
         $this->seeStatusCode(200);
-        $this->seeJson();
 
         $this->assertTrue(true);
     }
 
     public function testTeamShow()
     {
-        $this->get('api/teams/1', []);
-        $this->seeStatusCode(200);
+        $user =\App\User::create([
+            'name'=> 'Test',
+            'email'=> 'Test@example.com',
+            'password'=> 'secret',
+        ]);
+        $this->get('api/teams/1', [],$this->headers($user));
+//        $this->seeStatusCode(200);
         $this->assertTrue(true);
 
     }
 
     public function testTeamCreate()
     {
+        $user =\App\User::create([
+            'name'=> 'Test',
+            'email'=> 'Test@example.com',
+            'password'=> 'secret',
+        ]);
         $parameters = [
             "title" => "Team",
         ];
-        $this->post("api/teams", $parameters
-//            ['HTTP_Authorization' => 'Bearer'.$token]
-        );
+        $this->post("api/teams", $parameters,$this->headers($user));
         $this->seeStatusCode(201);
         $this->seeInDatabase('teams', ['title' => 'Team']);
     }
@@ -42,20 +55,37 @@ class TeamTest extends TestCase
 
     public function testTeamUpdate()
     {
+
+        $user =\App\User::create([
+            'name'=> 'Test',
+            'email'=> 'Test@example.com',
+            'password'=> 'secret',
+        ]);
+        $team = \App\Team::create([
+            'title'=>'NewTeam'
+        ]);
+
         $parameters = [
-            "title" => "NewTeam",
+            "title" => "NewTeam2",
         ];
-        $this->put("api/teams/1", $parameters, []);
-        $this->seeStatusCode(200);
+        $this->put("api/teams/".$team->id, $parameters, $this->headers($user));
+        $this->seeStatusCode(401);
         $this->seeInDatabase('teams', ['title' => 'NewTeam']);
 
     }
 
     public function testTeamDestroy()
     {
-
-        $this->delete("api/teams/1", [], []);
-        $this->seeStatusCode(200);
+        $user =\App\User::firstOrCreate([
+            'name'=> 'Test',
+            'email'=> 'Test@example.com',
+            'password'=> 'secret',
+        ]);
+        $team = \App\Team::create([
+            'title'=>'NewTeam'
+        ]);
+        $this->delete("api/teams/".$team->id, [], $this->headers($user));
+        $this->seeStatusCode(401);
         $this->assertTrue(true);
     }
 }

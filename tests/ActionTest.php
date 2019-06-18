@@ -5,6 +5,7 @@ use Laravel\Lumen\testing\DatabaseTransactions;
 
 class ActionTest extends TestCase
 {
+    use DatabaseMigrations;
     /**
      * A basic test example.
      *
@@ -12,11 +13,19 @@ class ActionTest extends TestCase
      */
     public function testAssignTeam()
     {
-        $parametr=[
-                'team_id'=>1,
-                'user_id'=>1
+        $user = \App\User::create([
+            'name' => 'Test',
+            'email' => 'Test@example.com',
+            'password' => 'secret',
+        ]);
+        $team = \App\Team::create([
+            'title' => 'New Team'
+        ]);
+        $parametr = [
+            'team_id' => $team->id,
+            'user_id' => $user->id
         ];
-        $this->post('api/assignTeam',$parametr);
+        $this->post('api/assignTeam', $parametr, $this->headers($user));
         $this->seeStatusCode(200);
         $this->seeJson();
         $this->assertTrue(true);
@@ -25,11 +34,19 @@ class ActionTest extends TestCase
 
     public function testAssignRole()
     {
-        $parametr=[
-            'role_id'=>1,
-            'user_id'=>1
+        $user = \App\User::create([
+            'name' => 'Test',
+            'email' => 'Test@example.com',
+            'password' => 'secret',
+        ]);
+        $role = \App\Role::create([
+            'title' => 'New Team'
+        ]);
+        $parametr = [
+            'role_id' => $role->id,
+            'user_id' => $user->id
         ];
-        $this->post('api/assignRole',$parametr);
+        $this->post('api/assignRole', $parametr, $this->headers($user));
         $this->seeStatusCode(200);
         $this->seeJson();
         $this->assertTrue(true);
@@ -38,11 +55,20 @@ class ActionTest extends TestCase
 
     public function testUnAssignRole()
     {
-        $parametr=[
-            'role_id'=>1,
-            'user_id'=>1
+        $user = \App\User::create([
+            'name' => 'Test',
+            'email' => 'Test@example.com',
+            'password' => 'secret',
+        ]);
+        $role = new \App\Role();
+            $role->title = 'New Role';
+        $user->roles()->save($role);
+
+        $parametr = [
+            'role_id' => $role->id,
+            'user_id' => $user->id
         ];
-        $this->post('api/unAssignRole',$parametr);
+        $this->post('api/unAssignRole', $parametr, $this->headers($user));
         $this->seeStatusCode(200);
         $this->seeJson();
         $this->assertTrue(true);
@@ -51,11 +77,20 @@ class ActionTest extends TestCase
 
     public function testUnAssignTeam()
     {
-        $parametr=[
-            'team_id'=>1,
-            'user_id'=>1
+        $user = \App\User::create([
+            'name' => 'Test',
+            'email' => 'Test@example.com',
+            'password' => 'secret',
+        ]);
+        $team = new \App\Team();
+        $team->title = "New Team";
+
+        $user->teams()->save($team);
+        $parametr = [
+            'team_id' => $team->id,
+            'user_id' => $user->id
         ];
-        $this->post('api/unAssignTeam',$parametr);
+        $this->post('api/unAssignTeam', $parametr, $this->headers($user));
         $this->seeStatusCode(200);
         $this->seeJson();
         $this->assertTrue(true);
@@ -63,11 +98,19 @@ class ActionTest extends TestCase
 
     public function testSetOwner()
     {
-        $parametr=[
-            'team_id'=>1,
-            'user_id'=>1
+        $user = \App\User::create([
+            'name' => 'Test',
+            'email' => 'Test@example.com',
+            'password' => 'secret',
+        ]);
+        $team = \App\Team::create([
+            'title' => 'New Team'
+        ]);
+        $parametr = [
+            'team_id' => $team->id,
+            'user_id' => $user->id
         ];
-        $this->post('api/unAssignTeam',$parametr);
+        $this->post('api/unAssignTeam', $parametr, $this->headers($user));
         $this->seeStatusCode(200);
         $this->seeJson();
         $this->assertTrue(true);

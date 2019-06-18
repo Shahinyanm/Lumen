@@ -5,7 +5,7 @@ use Laravel\Lumen\testing\DatabaseTransactions;
 
 class AuthTest extends TestCase
 {
-//    use DatabaseMigrations;
+    use DatabaseMigrations;
 
     /**
      * A basic test example.
@@ -34,9 +34,9 @@ class AuthTest extends TestCase
     public function it_will_register_a_user()
     {
         $response = $this->post('api/register', [
-            'email'    => 'test2@email.com',
-            'password' => '123456',
-            'name'=>'test user'
+            'email' => 'test2@email.com',
+            'password' => \Illuminate\Support\Facades\Hash::make('123456'),
+            'name' => 'test user'
         ]);
 
         $response->seeJsonStructure([
@@ -49,11 +49,16 @@ class AuthTest extends TestCase
     /** @test */
     public function it_will_log_a_user_in()
     {
+        \App\User::create([
+            'email' => 'test2@email.com',
+            'password' => \Illuminate\Support\Facades\Hash::make('123456'),
+            'name'=>'test'
+        ]);
         $response = $this->post('api/login', [
-            'email'    => 'test2@email.com',
+            'email' => 'test2@email.com',
             'password' => '123456'
         ]);
-        $this->seeStatusCode(200);
+        $response->seeStatusCode(200);
 
         $response->seeJsonStructure([
             'access_token',
@@ -66,13 +71,29 @@ class AuthTest extends TestCase
     public function it_will_not_log_an_invalid_user_in()
     {
         $response = $this->post('api/login', [
-            'email'    => 'test2@email.com',
+            'email' => 'test2@email.com',
             'password' => 'notlegitpassword'
         ]);
 
         $response->seeJsonStructure([
             'error',
         ]);
+    }
+
+    public function it_will_log_out_user()
+    {
+        $user = \App\User::create([
+            'name' => 'Test',
+            'email' => 'Test@example.com',
+            'password' => 'secret',
+        ]);
+        $response = $this->post('api/logout', [
+            'email' => 'test2@email.com',
+            'password' => 'notlegitpassword'
+        ],
+            $this->headers($user));
+        $this->seeStatusCode(200);
+
     }
 
 }

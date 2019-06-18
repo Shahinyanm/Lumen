@@ -5,6 +5,7 @@ use Laravel\Lumen\testing\DatabaseTransactions;
 
 class RoleTest extends TestCase
 {
+    use DatabaseMigrations;
     /**
      * A basic test example.
      *
@@ -12,46 +13,77 @@ class RoleTest extends TestCase
      */
     public function testShowAllroles()
     {
+        $user =\App\User::create([
+            'name'=> 'Test',
+            'email'=> 'Test@example.com',
+            'password'=> 'secret',
+        ]);
         $this->get('api/roles', []);
         $this->seeStatusCode(200);
         $this->seeJson();
         $this->assertTrue(true);
     }
 
-    public function testroleShow()
+    public function testRoleShow()
     {
-        $this->get('api/roles/1', []);
+        $user =\App\User::create([
+            'name'=> 'Test',
+            'email'=> 'Test@example.com',
+            'password'=> 'secret',
+        ]);
+        $role= \App\Role::create(['title'=>'admin']);
+        $this->get('api/roles/'.$role->id, $this->headers($user));
         $this->seeStatusCode(200);
         $this->assertTrue(true);
 
     }
 
-    public function testroleCreate()
+    public function testRoleCreate()
     {
+        $user =\App\User::create([
+            'name'=> 'Test',
+            'email'=> 'Test@example.com',
+            'password'=> 'secret',
+        ]);
         $parameters = [
             "title" => "role",
         ];
-        $this->post("api/roles", $parameters, []);
+        $this->post("api/roles", $parameters, $this->headers($user));
         $this->seeStatusCode(201);
         $this->seeInDatabase('roles', ['title' => 'role']);
     }
 
 
-    public function testroleUpdate()
+    public function testRoleUpdate()
     {
+        $user =\App\User::create([
+            'name'=> 'Test',
+            'email'=> 'Test@example.com',
+            'password'=> 'secret',
+        ]);
         $parameters = [
             "title" => "Newrole",
         ];
-        $this->put("api/roles/1", $parameters, []);
+        $role = \App\Role::firstOrCreate([
+            'title'=>'owner'
+        ]);
+        $this->put("api/roles/".$role->id, $parameters, $this->headers($user));
         $this->seeStatusCode(200);
         $this->seeInDatabase('roles', ['title' => 'Newrole']);
 
     }
 
-    public function testroleDestroy()
+    public function testRoleDestroy()
     {
-
-        $this->delete("api/roles/1", [], []);
+        $user =\App\User::create([
+            'name'=> 'Test',
+            'email'=> 'Test@example.com',
+            'password'=> 'secret',
+        ]);
+        $role = \App\Role::firstOrCreate([
+            'title'=>'owner'
+        ]);
+        $this->delete("api/roles/".$role->id, [], $this->headers($user));
         $this->seeStatusCode(200);
         $this->assertTrue(true);
     }
