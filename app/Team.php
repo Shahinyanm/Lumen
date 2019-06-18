@@ -15,4 +15,9 @@ class Team extends Model
     {
         return $this->belongsToMany(User::class,'user_teams','team_id','user_id');
     }
+
+    public function owner(){
+        return $this->belongsTo(User::class,'owner');
+    }
+
 }

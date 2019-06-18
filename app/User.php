@@ -42,6 +42,10 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         return $this->belongsToMany(Role::class,'user_roles','user_id','role_id');
     }
 
+    public function ownTeam(){
+        return $this->hasMany(Team::class,'owner');
+    }
+
     public function getJWTIdentifier()
     {
         return $this->getKey();

@@ -32,7 +32,9 @@ class TeamTest extends TestCase
         $parameters = [
             "title" => "Team",
         ];
-        $this->post("api/teams", $parameters, []);
+        $this->post("api/teams", $parameters
+//            ['HTTP_Authorization' => 'Bearer'.$token]
+        );
         $this->seeStatusCode(201);
         $this->seeInDatabase('teams', ['title' => 'Team']);
     }

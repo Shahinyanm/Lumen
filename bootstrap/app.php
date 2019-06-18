@@ -66,6 +66,7 @@ $app->bind(\Illuminate\Contracts\Routing\UrlGenerator::class, function ($app) {
 
  $app->routeMiddleware([
      'auth' => App\Http\Middleware\Authenticate::class,
+     'jwt' => App\Http\Middleware\JwtMiddleware::class,
 //     'client' => \Laravel\Passport\Http\Middleware\CheckClientCredentials::class,
  ]);
 
