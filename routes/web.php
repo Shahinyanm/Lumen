@@ -18,7 +18,7 @@ $router->get('/', function () use ($router) {
 $router->post('api/login',['uses' => 'AuthController@login']);
 $router->post('api/register',['uses' => 'AuthController@register']);
 
-$router->group(['prefix' => 'api','middleware'=>['jwt','auth']], function () use ($router) {
+$router->group(['prefix' => 'api','middleware'=>'jwt'], function () use ($router) {
     $router->post('logout',['uses' => 'AuthController@logout']);
 
 
