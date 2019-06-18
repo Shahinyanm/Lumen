@@ -19,8 +19,8 @@ class ActionController extends Controller
         if(!$pivot->owner){
             return response()->json('You can not assign users to this team, because you are not owner', 401);
         }
-        $old =$team->users->find($user->id,$team->id);
 
+        $old =$team->users->find($user->id);
         if(!$old){
             $team->users()->attach($user);
         }else{
