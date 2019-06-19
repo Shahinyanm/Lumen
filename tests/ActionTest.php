@@ -11,64 +11,73 @@ class ActionTest extends TestCase
      *
      * @return void
      */
+    protected static $user;
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $this->runDatabaseMigrations();
+
+        if (is_null(self::$user)) {
+            self::$user =  $user = factory(\App\User::class)->create([
+                'password' => \Illuminate\Support\Facades\Hash::make('secret'),
+            ]);
+        }
+    }
+
     public function testAssignTeam()
     {
-        $user = \App\User::create([
-            'name' => 'Test',
-            'email' => 'Test@example.com',
-            'password' => 'secret',
+        $user = factory(\App\User::class)->create([
+            'password' => \Illuminate\Support\Facades\Hash::make('secret'),
         ]);
         $team = \App\Team::create([
             'title' => 'New Team'
         ]);
+        self::$user->teams()->attach($team,['owner'=>self::$user->id]);
+
         $parametr = [
             'team_id' => $team->id,
             'user_id' => $user->id
         ];
-        $this->post('api/assignTeam', $parametr, $this->headers($user));
+        $this->post('api/assignTeam', $parametr, $this->headers(self::$user));
         $this->seeStatusCode(200);
-        $this->seeJson();
         $this->assertTrue(true);
     }
 
 
     public function testAssignRole()
     {
-        $user = \App\User::create([
-            'name' => 'Test',
-            'email' => 'Test@example.com',
-            'password' => 'secret',
-        ]);
         $role = \App\Role::create([
             'title' => 'New Team'
+        ]);
+        $user = factory(\App\User::class)->create([
+            'password' => \Illuminate\Support\Facades\Hash::make('secret'),
         ]);
         $parametr = [
             'role_id' => $role->id,
             'user_id' => $user->id
         ];
-        $this->post('api/assignRole', $parametr, $this->headers($user));
-        $this->seeStatusCode(401);
-        $this->seeJson();
+        $this->post('api/assignRole', $parametr, $this->headers(self::$user));
+        $this->seeStatusCode(200);
         $this->assertTrue(true);
     }
 
 
     public function testUnAssignRole()
     {
-        $user = \App\User::create([
-            'name' => 'Test',
-            'email' => 'Test@example.com',
-            'password' => 'secret',
+//
+        $user = factory(\App\User::class)->create([
+            'password' => \Illuminate\Support\Facades\Hash::make('secret'),
         ]);
         $role = new \App\Role();
             $role->title = 'New Role';
-        $user->roles()->save($role);
+        self::$user->roles()->save($role);
 
         $parametr = [
             'role_id' => $role->id,
-            'user_id' => $user->id
+            'user_id' => self::$user->id
         ];
-        $this->post('api/unAssignRole', $parametr, $this->headers($user));
+        $this->post('api/unAssignRole', $parametr, $this->headers(self::$user));
         $this->seeStatusCode(200);
         $this->seeJson();
         $this->assertTrue(true);
@@ -77,20 +86,19 @@ class ActionTest extends TestCase
 
     public function testUnAssignTeam()
     {
-        $user = \App\User::create([
-            'name' => 'Test',
-            'email' => 'Test@example.com',
-            'password' => 'secret',
+        $user = factory(\App\User::class)->create([
+            'password' => \Illuminate\Support\Facades\Hash::make('secret'),
         ]);
-        $team = new \App\Team();
-        $team->title = "New Team";
-
+        $team = \App\Team::create([
+            'title' => 'New Team'
+        ]);
+        self::$user->teams()->attach($team,['owner'=>self::$user->id]);
         $user->teams()->save($team);
         $parametr = [
             'team_id' => $team->id,
             'user_id' => $user->id
         ];
-        $this->post('api/unAssignTeam', $parametr, $this->headers($user));
+        $this->post('api/unAssignTeam', $parametr, $this->headers(self::$user));
         $this->seeStatusCode(200);
         $this->seeJson();
         $this->assertTrue(true);
@@ -98,19 +106,18 @@ class ActionTest extends TestCase
 
     public function testSetOwner()
     {
-        $user = \App\User::create([
-            'name' => 'Test',
-            'email' => 'Test@example.com',
-            'password' => 'secret',
+        $user = factory(\App\User::class)->create([
+            'password' => \Illuminate\Support\Facades\Hash::make('secret'),
         ]);
         $team = \App\Team::create([
             'title' => 'New Team'
         ]);
+        self::$user->teams()->attach($team,['owner'=>true]);
         $parametr = [
             'team_id' => $team->id,
             'user_id' => $user->id
         ];
-        $this->post('api/unAssignTeam', $parametr, $this->headers($user));
+        $this->post('api/unAssignTeam', $parametr, $this->headers(self::$user));
         $this->seeStatusCode(200);
         $this->seeJson();
         $this->assertTrue(true);

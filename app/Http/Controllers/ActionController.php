@@ -13,12 +13,11 @@ class ActionController extends Controller
     {
 
         $user = User::findOrfail($request->user_id);
-        $team = Team::with('users')->where('id', $request->team_id)->first();
+        $team = Team::with('users')->find($request->team_id);
         if (!$team) {
             return response()->json('Wrong Team ID', 401);
         }
         $pivot = optional($team->users->find(\Auth::id()))->pivot;
-
 
         if (!$pivot || !$pivot->owner) {
             return response()->json('You can not assign users to this team, because you are not owner', 401);
@@ -26,7 +25,7 @@ class ActionController extends Controller
 
         $old = $team->users->find($user->id);
         if (!$old) {
-            $team->users()->attach($user);
+            $team->users()->attach($user,['owner'=>false]);
         } else {
             return response()->json('User is already assigned team', 200);
 
@@ -47,15 +46,26 @@ class ActionController extends Controller
 
     public function unAssignTeam(Request $request)
     {
-
         $user = User::findOrfail($request->user_id);
-        $team = Team::where('id', $request->team_id)->where('owner', \Auth::id())->first();
+        $team = Team::with('users')->where('id', $request->team_id)->first();
         if (!$team) {
-            return response()->json('You can not un assign users to this team, because you are not owner', 200);
+            return response()->json('Wrong Team ID', 401);
         }
-        $team->users()->detach($user);
+        $pivot = optional($team->users->find(\Auth::id()))->pivot;
 
-        return response()->json('User Successfully assigned to Team', 200);
+        if (!$pivot || !$pivot->owner) {
+            return response()->json('You can not un assign users to this team, because you are not owner', 401);
+        }
+
+        $old = $team->users->find($user->id);
+        if ($old) {
+            $team->users()->detach($user);
+        } else {
+            return response()->json('There are no user in team', 200);
+
+        }
+
+        return response()->json('User Successfully unsigned to Team', 200);
     }
 
 

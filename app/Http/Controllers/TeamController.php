@@ -63,9 +63,13 @@ class TeamController extends Controller
 
     public function update($id, Request $request)
     {
-        $team = Team::with('users')->where('owner',\Auth::id())->where('id',$id)->first();
+        $team = Team::with('users')->find($id);
         if(!$team){
-            return response()->json(['failed','You have not access to edit this team'],401);
+            return response()->json(['failed','There are no team with '. $id.' id'],401);
+        }
+        $pivot = optional($team->users->find(\Auth::id()))->pivot;
+        if (!$pivot || !$pivot->owner) {
+            return response()->json('You can not update team, because you are not owner', 401);
         }
         $team->update($request->all());
 
@@ -74,11 +78,17 @@ class TeamController extends Controller
 
     public function delete($id)
     {
-        $team = Team::with('users')->where('owner',\Auth::id())->where('id',$id)->first();
+
+        $team = Team::with('users')->find($id);
+
         if(!$team){
-            return response()->json(['failed','You have not access to  delete this team'],401);
+            return response()->json(['failed','There are no team with '. $id.' id'],401);
         }
-        Team::findOrFail($id)->delete();
+        $pivot = optional($team->users->find(\Auth::id()))->pivot;
+        if (!$pivot || !$pivot->owner) {
+            return response()->json('You can not delete team, because you are not owner', 401);
+        }
+        $team->delete();
         return response('Deleted Successfully', 200);
     }
     //

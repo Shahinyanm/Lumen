@@ -23,4 +23,5 @@ abstract class TestCase extends Laravel\Lumen\Testing\TestCase
 
         return $headers;
     }
+
 }
