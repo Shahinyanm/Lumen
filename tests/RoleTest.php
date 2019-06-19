@@ -11,14 +11,21 @@ class RoleTest extends TestCase
      *
      * @return void
      */
+
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $this->runDatabaseMigrations();
+
+    }
+
     public function testShowAllroles()
     {
-        $user =\App\User::create([
-            'name'=> 'Test',
-            'email'=> 'Test@example.com',
-            'password'=> 'secret',
+        $user = factory(\App\User::class)->create([
+            'password' => \Illuminate\Support\Facades\Hash::make('secret'),
         ]);
-        $this->get('api/roles', []);
+        $this->get('api/roles', [],$this->headers($user));
         $this->seeStatusCode(200);
         $this->seeJson();
         $this->assertTrue(true);
@@ -26,10 +33,8 @@ class RoleTest extends TestCase
 
     public function testRoleShow()
     {
-        $user =\App\User::create([
-            'name'=> 'Test',
-            'email'=> 'Test@example.com',
-            'password'=> 'secret',
+        $user = factory(\App\User::class)->create([
+            'password' => \Illuminate\Support\Facades\Hash::make('secret'),
         ]);
         $role= \App\Role::create(['title'=>'admin']);
         $this->get('api/roles/'.$role->id, $this->headers($user));
@@ -40,10 +45,8 @@ class RoleTest extends TestCase
 
     public function testRoleCreate()
     {
-        $user =\App\User::create([
-            'name'=> 'Test',
-            'email'=> 'Test@example.com',
-            'password'=> 'secret',
+        $user = factory(\App\User::class)->create([
+            'password'=>\Illuminate\Support\Facades\Hash::make('secret')
         ]);
         $parameters = [
             "title" => "role",
@@ -56,10 +59,8 @@ class RoleTest extends TestCase
 
     public function testRoleUpdate()
     {
-        $user =\App\User::create([
-            'name'=> 'Test',
-            'email'=> 'Test@example.com',
-            'password'=> 'secret',
+        $user = factory(\App\User::class)->create([
+            'password'=>\Illuminate\Support\Facades\Hash::make('secret')
         ]);
         $parameters = [
             "title" => "Newrole",
@@ -75,10 +76,8 @@ class RoleTest extends TestCase
 
     public function testRoleDestroy()
     {
-        $user =\App\User::create([
-            'name'=> 'Test',
-            'email'=> 'Test@example.com',
-            'password'=> 'secret',
+        $user = factory(\App\User::class)->create([
+            'password'=>\Illuminate\Support\Facades\Hash::make('secret')
         ]);
         $role = \App\Role::firstOrCreate([
             'title'=>'owner'

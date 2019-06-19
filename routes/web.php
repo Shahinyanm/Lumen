@@ -31,6 +31,7 @@ $router->group(['prefix' => 'api','middleware'=>'jwt'], function () use ($router
 
 //Team routes
     $router->get('teams',  ['uses' => 'TeamController@showAllTeams']);
+    $router->get('myTeams',  ['uses' => 'TeamController@showAllMyTeams']);
     $router->get('teams/{id}', ['uses' => 'TeamController@show']);
     $router->post('teams', ['uses' => 'TeamController@create']);
     $router->delete('teams/{id}', ['uses' => 'TeamController@delete']);

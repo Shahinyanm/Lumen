@@ -20,24 +20,34 @@ class TeamController extends Controller
         //
     }
 
-
-    public function showAllTeams(Auth $auth)
+    public function showAllTeams()
     {
-        $teams = Team::with('users', 'owner')->whereHas('users', function ($u) {
+
+        $teams = Team::with('users')->whereHas('users', function ($u) {
             return $u->where('user_id', \Auth::id());
-        })->orWhere('owner', \Auth::id())->get();
+        })->get();
+
+        return response()->json($teams);
+    }
+
+    public function showAllMyTeams()
+    {
+        $teams = Team::with('users')->whereHas('users', function ($u) {
+            return $u->where('user_id', \Auth::id());
+        })->get()->map(function($team){
+            return $team->users()->where('user_teams.owner',1)->first();
+        });
 
         return response()->json($teams);
     }
 
     public function show($id)
     {
-        $team = Team::with('users', 'owner')
+        $team = Team::with('users')
             ->where('id', $id)
             ->whereHas('users', function ($u) {
                 return $u->where('user_id', \Auth::id());
-            })
-            ->orWhere('owner', \Auth::id())
+            })->orWherePivot('owner',\Auth::id())
             ->first();
 
 
@@ -46,13 +56,12 @@ class TeamController extends Controller
 
     public function create(Request $request)
     {
-
         $this->validate($request, [
             'title' => 'required',
         ]);
-        $team = new Team();
-        $team->title = $request->title;
-        $team->save();
+        $team = Team::create([
+            'title'=>$request->title
+        ]);
         \Auth::user()->teams()->attach($team,['owner'=>true]);
 
 
@@ -64,8 +73,8 @@ class TeamController extends Controller
     public function update($id, Request $request)
     {
         $team = Team::with('users')->find($id);
-        if(!$team){
-            return response()->json(['failed','There are no team with '. $id.' id'],401);
+        if (!$team) {
+            return response()->json(['failed', 'There are no team with ' . $id . ' id'], 401);
         }
         $pivot = optional($team->users->find(\Auth::id()))->pivot;
         if (!$pivot || !$pivot->owner) {
@@ -81,8 +90,8 @@ class TeamController extends Controller
 
         $team = Team::with('users')->find($id);
 
-        if(!$team){
-            return response()->json(['failed','There are no team with '. $id.' id'],401);
+        if (!$team) {
+            return response()->json(['failed', 'There are no team with ' . $id . ' id'], 401);
         }
         $pivot = optional($team->users->find(\Auth::id()))->pivot;
         if (!$pivot || !$pivot->owner) {
