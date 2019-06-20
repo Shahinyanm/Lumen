@@ -43,13 +43,9 @@ class TeamController extends Controller
 
     public function show($id)
     {
-        $team = Team::with('users')
-            ->where('id', $id)
-            ->whereHas('users', function ($u) {
-                return $u->where('user_id', \Auth::id());
-            })->orWherePivot('owner',\Auth::id())
-            ->first();
-
+        $team = Team::with('users')->whereHas('users', function ($u) {
+            return $u->where('user_id', \Auth::id());
+        })->where('id',$id)->first();
 
         return response()->json($team);
     }

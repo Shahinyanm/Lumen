@@ -11,21 +11,25 @@ class RoleTest extends TestCase
      *
      * @return void
      */
-
+protected static $user;
     public function setUp(): void
     {
         parent::setUp();
 
         $this->runDatabaseMigrations();
-
+        if (is_null(self::$user)) {
+            self::$user = $user = factory(\App\User::class)->create([
+                'password' => \Illuminate\Support\Facades\Hash::make('secret'),
+            ]);
+        }
     }
 
-    public function testShowAllroles()
+    public function testShowAllRoles()
     {
         $user = factory(\App\User::class)->create([
             'password' => \Illuminate\Support\Facades\Hash::make('secret'),
         ]);
-        $this->get('api/roles', [],$this->headers($user));
+        $response = $this->actingAs(self::$user)->get('api/roles', []);
         $this->seeStatusCode(200);
         $this->seeJson();
         $this->assertTrue(true);
@@ -37,7 +41,7 @@ class RoleTest extends TestCase
             'password' => \Illuminate\Support\Facades\Hash::make('secret'),
         ]);
         $role= \App\Role::create(['title'=>'admin']);
-        $this->get('api/roles/'.$role->id, $this->headers($user));
+        $response = $this->actingAs(self::$user)->get('api/roles/'.$role->id);
         $this->seeStatusCode(200);
         $this->assertTrue(true);
 
@@ -51,7 +55,7 @@ class RoleTest extends TestCase
         $parameters = [
             "title" => "role",
         ];
-        $this->post("api/roles", $parameters, $this->headers($user));
+        $response = $this->actingAs(self::$user)->post("api/roles", $parameters);
         $this->seeStatusCode(201);
         $this->seeInDatabase('roles', ['title' => 'role']);
     }
@@ -68,7 +72,7 @@ class RoleTest extends TestCase
         $role = \App\Role::firstOrCreate([
             'title'=>'owner'
         ]);
-        $this->put("api/roles/".$role->id, $parameters, $this->headers($user));
+        $response = $this->actingAs(self::$user)->put("api/roles/".$role->id, $parameters);
         $this->seeStatusCode(200);
         $this->seeInDatabase('roles', ['title' => 'Newrole']);
 
@@ -82,8 +86,7 @@ class RoleTest extends TestCase
         $role = \App\Role::firstOrCreate([
             'title'=>'owner'
         ]);
-        $this->delete("api/roles/".$role->id, [], $this->headers($user));
+        $response = $this->actingAs(self::$user)->delete("api/roles/".$role->id, []);
         $this->seeStatusCode(200);
-        $this->assertTrue(true);
     }
 }

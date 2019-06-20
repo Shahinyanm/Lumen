@@ -1,5 +1,8 @@
 <?php
 
+use App\Team;
+use App\User;
+use Illuminate\Support\Facades\Hash;
 use Laravel\Lumen\testing\DatabaseMigrations;
 use Laravel\Lumen\testing\DatabaseTransactions;
 
@@ -13,6 +16,7 @@ class TeamTest extends TestCase
      */
 
     protected static $user;
+
     public function setUp(): void
     {
         parent::setUp();
@@ -20,39 +24,66 @@ class TeamTest extends TestCase
         $this->runDatabaseMigrations();
 
         if (is_null(self::$user)) {
-            self::$user =  $user = factory(\App\User::class)->create([
-                'password' => \Illuminate\Support\Facades\Hash::make('secret'),
+            self::$user = $user = factory(User::class)->create([
+                'password' => Hash::make('secret'),
             ]);
         }
     }
 
     public function testShowAllTeams()
     {
-        $team = factory(\App\Team::class,10)->create();
+        $team = factory(Team::class, 10)->create();
+        self::$user->teams()->attach($team,['owner'=>true]);
 
-        $this->get('api/teams', [],$this->headers(self::$user));
+        $response = $this->actingAs(self::$user)->get('api/teams', []);
+        $this->assertEquals($team[0]->title,json_decode($response->response->getContent())[0]->title);
+        $response->seeJsonStructure([
+            '*' => [
+                'id', 'title','created_at','updated_at'
+            ]
+        ]);
+
         $this->seeStatusCode(200);
-
-        $this->assertTrue(true);
     }
 
     public function testShowAllMyTeams()
     {
-        $team = factory(\App\Team::class,10)->create();
+        $team = factory(Team::class, 10)->create();
+        $user = $user = factory(User::class)->create([
+            'password' => Hash::make('secret'),
+        ]);
+       $user->teams()->attach($team,['owner'=>true]);
 
-        $this->get('api/teams', [],$this->headers(self::$user));
+        $response = $this->actingAs($user)->get('api/teams', []);
+        $this->assertEquals($team[0]->title,json_decode($response->response->getContent())[0]->title);
+        $response->seeJsonStructure([
+            '*' => [
+                'id', 'title','created_at','updated_at'
+            ]
+        ]);
+
         $this->seeStatusCode(200);
 
-        $this->assertTrue(true);
     }
 
     public function testTeamShow()
     {
-        $team = factory(\App\Team::class)->create();
-        $this->get('api/teams/'.$team->id, [],$this->headers(self::$user));
-        $this->seeStatusCode(200);
-        $this->assertTrue(true);
 
+        $team = factory(Team::class)->create();
+        $user = $user = factory(User::class)->create([
+            'password' => Hash::make('secret'),
+        ]);
+       $user->teams()->attach($team,['owner'=>true]);
+
+        $response = $this->actingAs($user)->get('api/teams/' . $team->id, []);
+
+        $this->assertEquals($team->title,json_decode($response->response->getContent())->title);
+        $response->seeJsonStructure([
+            'id', 'title','created_at','updated_at',
+        ]);
+
+        $this->seeStatusCode(200);
+        $response->assertResponseOk();
     }
 
     public function testTeamCreate()
@@ -60,31 +91,34 @@ class TeamTest extends TestCase
         $parameters = [
             "title" => "Team",
         ];
-        $user = factory(\App\User::class)->create([
-            'password'=>\Illuminate\Support\Facades\Hash::make('secret')
+        $user = factory(User::class)->create([
+            'password' => Hash::make('secret')
         ]);
-        \Auth::setUser($user);
-        $this->post("api/teams", $parameters , $this->headers($user));
-        $this->seeStatusCode(201);
+        Auth::setUser($user);
+
+        $response = $this->actingAs(self::$user)->post("api/teams", $parameters);
+        $this->assertEquals($parameters['title'],json_decode($response->response->getContent())->title);
+
+        $response->seeJsonStructure([
+            'id', 'title','created_at','updated_at',
+        ]);
         $this->seeInDatabase('teams', ['title' => 'Team']);
+        $this->seeStatusCode(201);
     }
 
 
     public function testTeamUpdate()
     {
-
-        $team = factory(\App\Team::class)->create();
-        $user = factory(\App\User::class)->create([
-            'password'=>\Illuminate\Support\Facades\Hash::make('secret')
+        $team = factory(Team::class)->create();
+        $user = $user = factory(User::class)->create([
+            'password' => Hash::make('secret'),
         ]);
-
-
-        $user->teams()->attach($team,['owner'=>true]);
+        $user->teams()->attach($team, ['owner' => true]);
 
         $parameters = [
             "title" => "New Team",
         ];
-        $this->put("api/teams/".$team->id, $parameters, $this->headers(self::$user));
+        $response = $this->actingAs($user)->put("api/teams/" . $team->id, $parameters);
         $this->seeStatusCode(200);
         $this->seeInDatabase('teams', ['title' => 'New Team']);
 
@@ -93,12 +127,13 @@ class TeamTest extends TestCase
     public function testTeamDestroy()
     {
 
-        $team = factory(\App\Team::class)->create();
-        $user = factory(\App\User::class)->create([
-            'password'=>\Illuminate\Support\Facades\Hash::make('secret')
+        $team = factory(Team::class)->create();
+        $user = $user = factory(User::class)->create([
+            'password' => Hash::make('secret'),
         ]);
-        $user->teams()->attach($team,['owner'=>true]);
-        $this->delete("api/teams/".$team->id, [], $this->headers(self::$user));
+        $user->teams()->attach($team, ['owner' => true]);
+        $response = $this->actingAs($user)->delete("api/teams/" . $team->id, []);
+        $response->assertResponseOk();
         $this->seeStatusCode(200);
         $this->assertTrue(true);
     }

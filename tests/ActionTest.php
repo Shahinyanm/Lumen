@@ -39,7 +39,7 @@ class ActionTest extends TestCase
             'team_id' => $team->id,
             'user_id' => $user->id
         ];
-        $this->post('api/assignTeam', $parametr, $this->headers(self::$user));
+        $response = $this->actingAs(self::$user)->post('api/assignTeam', $parametr);
         $this->seeStatusCode(200);
         $this->assertTrue(true);
     }
@@ -57,7 +57,7 @@ class ActionTest extends TestCase
             'role_id' => $role->id,
             'user_id' => $user->id
         ];
-        $this->post('api/assignRole', $parametr, $this->headers(self::$user));
+        $response = $this->actingAs($user)->post('api/assignRole', $parametr);
         $this->seeStatusCode(200);
         $this->assertTrue(true);
     }
@@ -77,7 +77,7 @@ class ActionTest extends TestCase
             'role_id' => $role->id,
             'user_id' => self::$user->id
         ];
-        $this->post('api/unAssignRole', $parametr, $this->headers(self::$user));
+        $this->post('api/unAssignRole', $parametr);
         $this->seeStatusCode(200);
         $this->seeJson();
         $this->assertTrue(true);
@@ -98,7 +98,7 @@ class ActionTest extends TestCase
             'team_id' => $team->id,
             'user_id' => $user->id
         ];
-        $this->post('api/unAssignTeam', $parametr, $this->headers(self::$user));
+        $response = $this->actingAs($user)->post('api/unAssignTeam', $parametr);
         $this->seeStatusCode(200);
         $this->seeJson();
         $this->assertTrue(true);
@@ -117,7 +117,7 @@ class ActionTest extends TestCase
             'team_id' => $team->id,
             'user_id' => $user->id
         ];
-        $this->post('api/unAssignTeam', $parametr, $this->headers(self::$user));
+        $response = $this->actingAs($user)->post('api/unAssignTeam', $parametr);
         $this->seeStatusCode(200);
         $this->seeJson();
         $this->assertTrue(true);

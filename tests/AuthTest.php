@@ -38,7 +38,6 @@ class AuthTest extends TestCase
             'password' => \Illuminate\Support\Facades\Hash::make('123456'),
             'name' => 'test user'
         ]);
-
         $response->seeJsonStructure([
             'access_token',
             'token_type',

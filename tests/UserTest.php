@@ -12,30 +12,45 @@ class UserTest extends TestCase
      * @return void
      */
 
+    protected static $user;
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $this->runDatabaseMigrations();
+        if (is_null(self::$user)) {
+            self::$user = $user = factory(\App\User::class)->create([
+                'password' => \Illuminate\Support\Facades\Hash::make('secret'),
+            ]);
+        }
+    }
+
+
     public function testShowAllUsers()
     {
-        $user =\App\User::create([
-            'name'=> 'Test',
-            'email'=> 'Test@example.com',
-            'password'=> 'secret',
-        ]);
-        $this->get('api/users', $this->headers($user));
-        $this->seeStatusCode(200);
-//        $this->seeJson();
 
-        $this->assertTrue(true);
+        $response = $this->actingAs(self::$user)->get('api/users', []);
+        $response->seeJsonStructure([
+            '*' => [
+                'id', 'name','email','created_at'
+            ]
+        ]);
+        $this->seeStatusCode(200);
+
     }
 
     public function testShow()
     {
-        $user =\App\User::create([
-            'name'=> 'Test',
-            'email'=> 'Test@example.com',
-            'password'=> 'secret',
+        $users = factory(\App\User::class,10)->create([
+            'password' => \Illuminate\Support\Facades\Hash::make('secret'),
         ]);
-        $this->get('api/users/1',  $this->headers($user));
+        $response = $this->actingAs(self::$user)->get('api/users/1',[]);
+
+        $response->seeJsonStructure([
+            'id', 'name','email','created_at'
+        ]);
         $this->seeStatusCode(200);
-        $this->assertTrue(true);
+        $response->assertResponseStatus(200);
 
     }
 
@@ -64,8 +79,9 @@ class UserTest extends TestCase
             "email" => "Newtest@test.com",
             "password" => "secret"
         ];
-        $this->put("api/users/1", $parameters,  $this->headers($user));
+        $response = $this->actingAs(self::$user)->put("api/users/1", $parameters);
         $this->seeStatusCode(200);
+        $response->assertResponseStatus(200);
         $this->seeInDatabase('users', ['email' => 'Newtest', 'email' => 'Newtest@test.com']);
 
     }
@@ -77,8 +93,24 @@ class UserTest extends TestCase
             'email'=> 'Test@example.com',
             'password'=> 'secret',
         ]);
-        $this->delete("api/users/".$user->id, [],  $this->headers($user));
+        $response = $this->actingAs(self::$user)->delete("api/users/".self::$user->id, []);
         $this->seeStatusCode(200);
+        $response->assertResponseStatus(200);
+        $this->assertTrue(true);
+    }
+
+
+    public function testDestroyFailed()
+    {
+        $user =\App\User::create([
+            'name'=> 'Test',
+            'email'=> 'Test@example.com',
+            'password'=> 'secret',
+        ]);
+        $response = $this->actingAs($user)->delete("api/users/".$user->id, []);
+//        dd(json_decode($response->response->getContent()));
+       $response->assertResponseStatus(200);
+
         $this->assertTrue(true);
     }
 }
