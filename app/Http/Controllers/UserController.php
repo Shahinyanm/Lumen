@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Interfaces\UserInterface;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -14,33 +15,22 @@ class UserController extends Controller
      *
      * @return void
      */
-    public function __construct(){}
+    protected $user;
+    public function __construct(UserInterface $userRepository){
+    	$this->user = $userRepository;
+    }
 
     public function showAllUsers()
     {
-        return response()->json(User::all(),200);
+        return response()->json($this->user->showAllUsers(),200);
     }
 
     public function show($id)
     {
-        return response()->json(User::findOrFail($id),200);
+        return response()->json($this->user->show($id),200);
     }
 
-//    public function create(Request $request)
-//    {
-//        $this->validate($request, [
-//            'name' => 'required',
-//            'email' => 'required|email|unique:users',
-//            'password' => 'required|min:6'
-//        ]);
-//        $user = new User();
-//        $user->name = $request->name;
-//        $user->email = $request->email;
-//        $user->password = Hash::make($request->password);
-//        $user->save();
-//        return response()->json($user, 201);
-//
-//    }
+
 
 
     public function update($id, Request $request)
@@ -48,12 +38,8 @@ class UserController extends Controller
         if($id  != \Auth::id()){
             return  response()->json(['failed','You can not edit other users'], 401);
         }
-        $user = User::findOrFail($id);
-        $user->name = $request->name;
-        $user->email = $request->email;
-        $user->password = Hash::make($request->password);
-        $user->save();
-        return response()->json($user, 200);
+
+        return response()->json($this->user->update($id,$request->all()), 200);
     }
 
     public function delete($id)
@@ -61,7 +47,7 @@ class UserController extends Controller
         if($id  != \Auth::id()){
             return  response()->json(['failed','You can not edit other users'], 401);
         }
-        User::findOrFail($id)->delete();
+        $this->user->destroy($id);
         return response('Deleted Successfully', 200);
     }
     //

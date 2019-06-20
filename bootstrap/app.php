@@ -81,12 +81,16 @@ $app->bind(\Illuminate\Contracts\Routing\UrlGenerator::class, function ($app) {
 |
 */
 
-// $app->register(App\Providers\AppServiceProvider::class);
-$app->register(App\Providers\AppServiceProvider::class);
 $app->register(App\Providers\AuthServiceProvider::class);
 $app->register(Tymon\JWTAuth\Providers\LumenServiceProvider::class);
+$app->register(App\Providers\RepoServiceProvider::class);
 
 $app->register(Flipbox\LumenGenerator\LumenGeneratorServiceProvider::class);
+
+
+//$app->register('\Sentry\SentryLaravel\SentryLumenServiceProvider',
+//	$app->bind('App\Interface\UserInterface','App\Repositories\UserRepository')
+//);
 //$app->register(Laravel\Passport\PassportServiceProvider::class);
 //$app->register(Dusterio\LumenPassport\PassportServiceProvider::class);
 

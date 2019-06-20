@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Interfaces\TeamInterface;
 use App\Team;
 use App\User;
 use Illuminate\Http\Request;
@@ -15,39 +16,27 @@ class TeamController extends Controller
      *
      * @return void
      */
-    public function __construct()
+
+    protected $team;
+
+    public function __construct(TeamInterface $teamRepository)
     {
-        //
+        $this->team = $teamRepository;
     }
 
     public function showAllTeams()
     {
-
-        $teams = Team::with('users')->whereHas('users', function ($u) {
-            return $u->where('user_id', \Auth::id());
-        })->get();
-
-        return response()->json($teams);
+        return response()->json($this->team->showAllTeams());
     }
 
     public function showAllMyTeams()
     {
-        $teams = Team::with('users')->whereHas('users', function ($u) {
-            return $u->where('user_id', \Auth::id());
-        })->get()->map(function($team){
-            return $team->users()->where('user_teams.owner',1)->first();
-        });
-
-        return response()->json($teams);
+        return response()->json($this->team->showAllMyTeams());
     }
 
     public function show($id)
     {
-        $team = Team::with('users')->whereHas('users', function ($u) {
-            return $u->where('user_id', \Auth::id());
-        })->where('id',$id)->first();
-
-        return response()->json($team);
+        return response()->json($this->team->showTeam($id));
     }
 
     public function create(Request $request)
@@ -55,46 +44,20 @@ class TeamController extends Controller
         $this->validate($request, [
             'title' => 'required',
         ]);
-        $team = Team::create([
-            'title'=>$request->title
-        ]);
-        \Auth::user()->teams()->attach($team,['owner'=>true]);
 
-
-        return response()->json($team, 201);
+        return response()->json($this->team->create($request->all()), 201);
 
     }
 
-
     public function update($id, Request $request)
     {
-        $team = Team::with('users')->find($id);
-        if (!$team) {
-            return response()->json(['failed', 'There are no team with ' . $id . ' id'], 401);
-        }
-        $pivot = optional($team->users->find(\Auth::id()))->pivot;
-        if (!$pivot || !$pivot->owner) {
-            return response()->json('You can not update team, because you are not owner', 401);
-        }
-        $team->update($request->all());
-
-        return response()->json($team, 200);
+        return response()->json($this->team->update($id,$request->all()), 200);
     }
 
     public function delete($id)
     {
+		return $this->team->delete($id);
 
-        $team = Team::with('users')->find($id);
-
-        if (!$team) {
-            return response()->json(['failed', 'There are no team with ' . $id . ' id'], 401);
-        }
-        $pivot = optional($team->users->find(\Auth::id()))->pivot;
-        if (!$pivot || !$pivot->owner) {
-            return response()->json('You can not delete team, because you are not owner', 401);
-        }
-        $team->delete();
-        return response('Deleted Successfully', 200);
     }
     //
 }
