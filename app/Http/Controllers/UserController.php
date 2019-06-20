@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Interfaces\BaseRepositoryInterface;
 use App\Interfaces\UserInterface;
+use App\Repositories\BaseRepository;
+use App\Team;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -16,8 +19,11 @@ class UserController extends Controller
      * @return void
      */
     protected $user;
-    public function __construct(UserInterface $userRepository){
-    	$this->user = $userRepository;
+    protected $team;
+    public function __construct(User $user,Team $team){
+    	$this->user = new BaseRepository($user);
+    	$this->team = new BaseRepository($user);
+    	dd($this->user->all(),$this->team->all());
     }
 
     public function showAllUsers()

@@ -2,9 +2,11 @@
 
 namespace App\Providers;
 
+use App\Interfaces\BaseRepositoryInterface;
 use App\Interfaces\RoleInterface;
 use App\Interfaces\TeamInterface;
 use App\Interfaces\UserInterface;
+use App\Repositories\BaseRepository;
 use App\Repositories\RoleRepository;
 use App\Repositories\TeamRepository;
 use App\Repositories\UserRepository;
@@ -19,6 +21,8 @@ class RepoServiceProvider extends ServiceProvider
 	 */
 	public function register()
 	{
+
+		$this->app->bind(BaseRepositoryInterface::class,BaseRepository::class);
 		$this->app->bind(UserInterface::class,UserRepository::class);
 		$this->app->bind(TeamInterface::class,TeamRepository::class);
 		$this->app->bind(RoleInterface::class,RoleRepository::class);

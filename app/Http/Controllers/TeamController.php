@@ -26,6 +26,7 @@ class TeamController extends Controller
 
     public function showAllTeams()
     {
+    	$this->team->all();
         return response()->json($this->team->showAllTeams());
     }
 

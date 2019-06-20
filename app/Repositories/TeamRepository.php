@@ -5,7 +5,7 @@ namespace App\Repositories;
 use App\Interfaces\TeamInterface;
 use App\Team;
 
-class TeamRepository implements TeamInterface
+class TeamRepository extends BaseRepository implements TeamInterface
 {
 
 	public function showAllMyTeams()

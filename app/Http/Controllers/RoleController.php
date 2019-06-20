@@ -32,7 +32,6 @@ class RoleController extends Controller
 			'title' => 'required',
 		]);
 
-
 		return response()->json($this->role->create($request->all()), 201);
 
 	}

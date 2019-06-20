@@ -7,9 +7,9 @@ use App\User;
 use Illuminate\Support\Facades\Hash;
 use mysql_xdevapi\Collection;
 
-class UserRepository implements UserInterface
+class UserRepository extends BaseRepository implements UserInterface
 {
-	public function showAllUsers()
+	public function showAllUsers(): array
 	{
 		return User::all();
 	}
