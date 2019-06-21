@@ -6,30 +6,29 @@ use App\Interfaces\BaseRepositoryInterface;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Lumen\Application;
 
-abstract class BaseRepository  implements BaseRepositoryInterface
+ class BaseRepository  implements BaseRepositoryInterface
 {
 	// model property on class instances
 	protected $model;
-	protected $app;
+//	protected $app;
 	// Constructor to bind model to repo
 	public function __construct(Application $app)
 	{
-		$this->app =$app;
-		$this->makeModel();
+		$this->model = (new $this->model);
 	}
 
-	abstract public function model();
-	// Get all instances of model
-
-	public function makeModel(){
-		$model = $this->app->make($this->model());
-
-		if (!$model instanceof Model) {
-			return response()->json(['failed',$model.' is not instanceof Model']);
-		}
-
-		return $this->model = $model;
-	}
+//	abstract public function model();
+//
+//
+//	public function makeModel(){
+//		$model = $this->app->make($this->model());
+//
+//		if (!$model instanceof Model) {
+//			return response()->json(['failed',$model.' is not instanceof Model']);
+//		}
+//
+//		return $this->model = $model;
+//	}
 
 	public function all()
 	{

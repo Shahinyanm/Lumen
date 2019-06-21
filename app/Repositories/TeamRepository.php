@@ -7,10 +7,10 @@ use App\Team;
 
 class TeamRepository extends BaseRepository implements TeamInterface
 {
-
-	public function model(){
-		return Team::class;
-	}
+	protected $model = Team::class;
+//	public function model(){
+//		return Team::class;
+//	}
 
 	public function showAllMyTeams()
 	{

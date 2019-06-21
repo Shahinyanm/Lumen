@@ -8,9 +8,11 @@ use Illuminate\Support\Facades\Hash;
 
 class UserRepository extends BaseRepository implements UserInterface
 {
-	public function model(){
-		return User::class;
-	}
+
+	protected $model = User::class;
+//	public function model(){
+//		return User::class;
+//	}
 
 	public function showAllUsers()
 	{
