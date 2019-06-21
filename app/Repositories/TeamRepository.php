@@ -8,9 +8,13 @@ use App\Team;
 class TeamRepository extends BaseRepository implements TeamInterface
 {
 
+	public function model(){
+		return Team::class;
+	}
+
 	public function showAllMyTeams()
 	{
-		return Team::with('users')->whereHas('users', function ($u) {
+		return $this->model->with('users')->whereHas('users', function ($u) {
 			return $u->where('user_id', \Auth::id());
 		})->get()->map(function ($team) {
 			return $team->users()->where('user_teams.owner', 1)->first();
@@ -20,21 +24,21 @@ class TeamRepository extends BaseRepository implements TeamInterface
 
 	public function showAllTeams()
 	{
-		return Team::with('users')->whereHas('users', function ($u) {
+		return $this->model->with('users')->whereHas('users', function ($u) {
 			return $u->where('user_id', \Auth::id());
 		})->get();
 	}
 
 	public function showTeam($id)
 	{
-		return Team::with('users')->whereHas('users', function ($u) {
+		return $this->model->with('users')->whereHas('users', function ($u) {
 			return $u->where('user_id', \Auth::id());
 		})->where('id',$id)->first();
 	}
 
-	public function update($id, $data)
+	public function updateTeam($id,$data)
 	{
-		$team = Team::with('users')->find($id);
+		$team = $this->model->with('users')->find($id);
 		if (!$team) {
 			return response()->json(['failed', 'There are no team with ' . $id . ' id'], 401);
 		}
@@ -46,19 +50,10 @@ class TeamRepository extends BaseRepository implements TeamInterface
 		return $team;
 	}
 
-	public function create($data)
-	{
-		$team = Team::create([
-			'title'=>$data['title']
-		]);
-		\Auth::user()->teams()->attach($team,['owner'=>true]);
 
-		return $team;
-	}
-
-	public function delete($id)
+	public function deleteTeam($id)
 	{
-		$team = Team::with('users')->find($id);
+		$team = $this->model->with('users')->find($id);
 
 		if (!$team) {
 			return response()->json(['failed', 'There are no team with ' . $id . ' id'], 401);
@@ -75,7 +70,7 @@ class TeamRepository extends BaseRepository implements TeamInterface
 
 	public function pivot($id)
 	{
-		$team = Team::with("users")->find($id);
+		$team = $this->model->with("users")->find($id);
 		if (!$team) {
 			return response()->json('Wrong Team ID', 401);
 		}
@@ -86,7 +81,7 @@ class TeamRepository extends BaseRepository implements TeamInterface
 
 	public function find($id)
 	{
-		return Team::with("users")->find($id);
+		return $this->model->with("users")->find($id);
 	}
 	public function userInTeam($team_id, $user_id)
 	{

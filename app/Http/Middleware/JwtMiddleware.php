@@ -25,7 +25,7 @@ class JwtMiddleware extends BaseMiddleware
                 $user = JWTAuth::setRequest($request)->parseToken()->authenticate();
             }
             $user = JWTAuth::parseToken()->authenticate();
-            Auth::setUser($user);
+	        Auth::setUser($user);
         } catch (Exception $e) {
             if ($e instanceof \Tymon\JWTAuth\Exceptions\TokenInvalidException) {
                 return response()->json(['status' => 'Token is Invalid']);
@@ -35,6 +35,7 @@ class JwtMiddleware extends BaseMiddleware
                 return response()->json(['status' => 'Authorization Token not found']);
             }
         }
-        return $next($request);
+
+	    return $next($request);
     }
 }

@@ -4,19 +4,33 @@ namespace App\Repositories;
 
 use App\Interfaces\BaseRepositoryInterface;
 use Illuminate\Database\Eloquent\Model;
+use Laravel\Lumen\Application;
 
-class BaseRepository  implements BaseRepositoryInterface
+abstract class BaseRepository  implements BaseRepositoryInterface
 {
 	// model property on class instances
 	protected $model;
-
+	protected $app;
 	// Constructor to bind model to repo
-	public function __construct(Model $model)
+	public function __construct(Application $app)
 	{
-		$this->model = $model;
+		$this->app =$app;
+		$this->makeModel();
 	}
 
+	abstract public function model();
 	// Get all instances of model
+
+	public function makeModel(){
+		$model = $this->app->make($this->model());
+
+		if (!$model instanceof Model) {
+			return response()->json(['failed',$model.' is not instanceof Model']);
+		}
+
+		return $this->model = $model;
+	}
+
 	public function all()
 	{
 		return $this->model->all();
@@ -29,14 +43,15 @@ class BaseRepository  implements BaseRepositoryInterface
 	}
 
 	// update record in the database
-	public function update(array $data, $id)
+	public function update($id,array $data)
 	{
-		$record = $this->find($id);
-		return $record->update($data);
+		$record = $this->show($id);
+		$record->update($data);
+		return  $record;
 	}
 
 	// remove record from the database
-	public function delete($id)
+	public function destroy($id)
 	{
 		return $this->model->destroy($id);
 	}
@@ -44,7 +59,12 @@ class BaseRepository  implements BaseRepositoryInterface
 	// show the record with the given id
 	public function show($id)
 	{
-		return $this->model-findOrFail($id);
+		return $this->model->findOrFail($id);
+	}
+
+	public function findBy($data)
+	{
+	return $this->model->where($data)->get();
 	}
 
 	// Get the associated model

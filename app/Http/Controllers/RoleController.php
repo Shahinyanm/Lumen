@@ -17,7 +17,7 @@ class RoleController extends Controller
 	public function showAllRoles()
 	{
 
-		return response()->json($this->role->showAllRoles());
+		return response()->json($this->role->all());
 	}
 
 	public function show($id)
@@ -46,7 +46,7 @@ class RoleController extends Controller
 
 	public function delete($id)
 	{
-		if ($this->role->delete($id)) {
+		if ($this->role->destroy($id)) {
 			return response('Deleted Successfully', 200);
 		} else {
 			return response('Something Wrong', 404);

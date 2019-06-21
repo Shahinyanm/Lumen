@@ -2,7 +2,7 @@
 
 namespace App\Interfaces;
 
-interface TeamInterface {
+interface TeamInterface extends BaseRepositoryInterface{
 
 	public function showAllTeams();
 
@@ -10,11 +10,10 @@ interface TeamInterface {
 
 	public function showTeam($id);
 
-	public function create($data);
 
-	public function update($id,$data);
+	public function updateTeam($id,$data);
 
-	public function delete($id);
+	public function deleteTeam($id);
 
 	public function pivot($id);
 

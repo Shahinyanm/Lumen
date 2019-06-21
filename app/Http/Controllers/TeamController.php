@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Interfaces\TeamInterface;
+use App\Repositories\BaseRepository;
 use App\Team;
 use App\User;
 use Illuminate\Http\Request;
@@ -19,9 +20,9 @@ class TeamController extends Controller
 
     protected $team;
 
-    public function __construct(TeamInterface $teamRepository)
+    public function __construct(TeamInterface $teamRepasitory)
     {
-        $this->team = $teamRepository;
+        $this->team = $teamRepasitory;
     }
 
     public function showAllTeams()
@@ -45,19 +46,21 @@ class TeamController extends Controller
         $this->validate($request, [
             'title' => 'required',
         ]);
+	    $team =$this->team->create($request->all());
+	    \Auth::user()->teams()->attach($team,['owner'=>true]);
 
-        return response()->json($this->team->create($request->all()), 201);
+	    return response()->json($team, 201);
 
     }
 
     public function update($id, Request $request)
     {
-        return response()->json($this->team->update($id,$request->all()), 200);
+        return response()->json($this->team->updateTeam($id,$request->all()), 200);
     }
 
     public function delete($id)
     {
-		return $this->team->delete($id);
+		return $this->team->deleteTeam($id);
 
     }
     //

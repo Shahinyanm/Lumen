@@ -19,11 +19,9 @@ class UserController extends Controller
      * @return void
      */
     protected $user;
-    protected $team;
-    public function __construct(User $user,Team $team){
-    	$this->user = new BaseRepository($user);
-    	$this->team = new BaseRepository($user);
-    	dd($this->user->all(),$this->team->all());
+    public function __construct(UserInterface $user){
+    	$this->user = $user;
+
     }
 
     public function showAllUsers()
@@ -35,8 +33,6 @@ class UserController extends Controller
     {
         return response()->json($this->user->show($id),200);
     }
-
-
 
 
     public function update($id, Request $request)
