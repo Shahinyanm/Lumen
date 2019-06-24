@@ -8,11 +8,10 @@ use Laravel\Lumen\Application;
 
  class BaseRepository  implements BaseRepositoryInterface
 {
-	// model property on class instances
 	protected $model;
 //	protected $app;
 	// Constructor to bind model to repo
-	public function __construct(Application $app)
+	public function __construct()
 	{
 		$this->model = (new $this->model);
 	}
