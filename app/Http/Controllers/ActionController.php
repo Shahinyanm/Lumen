@@ -31,7 +31,7 @@ class ActionController extends Controller
 		$pivot = $this->team->pivot($request->team_id);
 
 		if (!$pivot || !$pivot->owner) {
-			return response()->json('You can not assign users to this team, because you are not owner', 401);
+			return response()->json(['failed'=>'You can not assign users to this team, because you are not owner'], 401);
 		}
 
 		$userInTeam = $this->team->userInTeam($request->team_id, $user->id);
@@ -40,11 +40,11 @@ class ActionController extends Controller
 			$team->users()->attach($user, ['owner' => false]);
 		}
 		else {
-			return response()->json('User is already assigned team', 200);
+			return response()->json(['failed'=>'User is already assigned team'], 403);
 
 		}
 
-		return response()->json('User Successfully assigned to Team', 200);
+		return response()->json(['success'=>'User Successfully assigned to Team'], 200);
 	}
 
 
@@ -62,16 +62,16 @@ class ActionController extends Controller
 		$user = $this->user->show($request->user_id);
 		$pivot = $this->team->pivot($request->team_id);
 		if (!$pivot || !$pivot->owner) {
-			return response()->json('You can not un assign users to this team, because you are not owner', 401);
+			return response()->json(['failed'=>'You can not un assign users to this team, because you are not owner'], 404);
 		}
 		$team = $this->team->find($request->team_id);
 		$userInTeam = $this->team->userInTeam($request->team_id, $user->id);
 		if (!$userInTeam) {
-			return response()->json('There are no user in team', 200);
+			return response()->json(['failed'=>'There are no user in team'], 404);
 		}
 		$team->users()->detach($user);
 
-		return response()->json('User Successfully unsigned to Team', 200);
+		return response()->json(['success'=>'User Successfully unsigned to Team'], 200);
 	}
 
 

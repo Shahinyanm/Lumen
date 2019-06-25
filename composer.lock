@@ -4,8 +4,57 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0155ae378be60c49e192d184c4a839b3",
+    "content-hash": "7bd55c3fab4c450d0d33574699e650da",
     "packages": [
+        {
+            "name": "albertcht/lumen-helpers",
+            "version": "v0.7",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/albertcht/lumen-helpers.git",
+                "reference": "f247213820623784a72533327fe9e5f0f3494a26"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/albertcht/lumen-helpers/zipball/f247213820623784a72533327fe9e5f0f3494a26",
+                "reference": "f247213820623784a72533327fe9e5f0f3494a26",
+                "shasum": ""
+            },
+            "require": {
+                "laravel/lumen-framework": "^5.1",
+                "php": "^5.6|^7.0"
+            },
+            "require-dev": {
+                "mockery/mockery": "^1.0",
+                "phpunit/phpunit": "^6.1"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "AlbertCht\\Lumen\\Helpers\\": "src/"
+                },
+                "files": [
+                    "src/helpers.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Albert Chen",
+                    "email": "albert.cht@gmail.com"
+                }
+            ],
+            "description": "To support Laravel 's unsupported features in Lumen.",
+            "keywords": [
+                "heplers",
+                "laravel",
+                "lumen"
+            ],
+            "time": "2019-06-13T12:31:28+00:00"
+        },
         {
             "name": "classpreloader/classpreloader",
             "version": "3.2.0",

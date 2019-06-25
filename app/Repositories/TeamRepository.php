@@ -40,11 +40,11 @@ class TeamRepository extends BaseRepository implements TeamInterface
 	{
 		$team = $this->model->with('users')->find($id);
 		if (!$team) {
-			return response()->json(['failed', 'There are no team with ' . $id . ' id'], 401);
+			return response()->json(['failed'=> 'There are no team with ' . $id . ' id'], 401);
 		}
 		$pivot = optional($team->users->find(\Auth::id()))->pivot;
 		if (!$pivot || !$pivot->owner) {
-			return response()->json('You can not update team, because you are not owner', 401);
+			return response()->json(['failed'=>'You can not update team, because you are not owner'], 401);
 		}
 		$team->update($data);
 		return $team;
@@ -56,15 +56,15 @@ class TeamRepository extends BaseRepository implements TeamInterface
 		$team = $this->model->with('users')->find($id);
 
 		if (!$team) {
-			return response()->json(['failed', 'There are no team with ' . $id . ' id'], 401);
+			return response()->json(['failed'=> 'There are no team with ' . $id . ' id'], 401);
 		}
 		$pivot = optional($team->users->find(\Auth::id()))->pivot;
 		if (!$pivot || !$pivot->owner) {
-			return response()->json('You can not delete team, because you are not owner', 401);
+			return response()->json(['failed'=>'You can not delete team, because you are not owner'],401);
 		}
 		$team->delete();
 
-		return response()->json(['success','Deleted Successfully'], 200);;
+		return response()->json(['success'=>'Deleted Successfully'], 200);
 	}
 
 

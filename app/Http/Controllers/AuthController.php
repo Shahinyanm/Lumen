@@ -75,7 +75,7 @@ class AuthController extends Controller
     {
         $this->guard()->logout();
 
-        return response()->json(['message' => 'Successfully logged out']);
+        return response()->json(['message' => 'Successfully logged out','status'=>1],200);
     }
 
     /**
@@ -100,7 +100,7 @@ class AuthController extends Controller
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
-            'expires_in' => $this->guard()->factory()->getTTL() * 60*60
+            'expires_in' => $this->guard()->factory()->getTTL() * 60*60*60
         ]);
     }
 

@@ -19,6 +19,8 @@ $router->post('api/login', ['uses' => 'AuthController@login']);
 $router->post('api/register', ['uses' => 'AuthController@register']);
 
 $router->group(['prefix' => 'api', 'middleware' => 'jwt'], function () use ($router) {
+	$router->get('me', ['uses' => 'AuthController@me']);
+
 	$router->post('logout', ['uses' => 'AuthController@logout']);
 
 	//users Routes
@@ -51,5 +53,8 @@ $router->group(['prefix' => 'api', 'middleware' => 'jwt'], function () use ($rou
 	$router->post('setOwner', ['uses' => 'ActionController@setOwner']);
 });
 
-$router->get('login',['uses'=>'Auth\LoginController@showLoginForm']);
+$router->get('/', function () use ($router) {
+	return view('app');
+});
 
+$router->get('/{any:.*}', 'MainController@index');
