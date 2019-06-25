@@ -59,7 +59,7 @@
 </template>
 
 <script>
-    import router from '../router'
+    import {router} from '../router'
     // import store from '@/store'
 
     export default {
@@ -72,12 +72,7 @@
                 name: '',
             }
         },
-        beforeCreate() {
-            if(localStorage.getItem('token')){
-                this.$router.push({ name: "/"});
 
-            }
-        },
         methods: {
             register() {
 

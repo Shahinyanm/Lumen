@@ -54,15 +54,15 @@
             }
         },
         beforeCreate: function () {
-            this.$http.get('api/me').then((response) => {
-                console.log(response)
-            }, (error) => {
-                console.log(error)
-            })
-            if (!localStorage.getItem('token')) {
-
-                this.$router.push({name: "login"});
-            }
+            // this.$http.get('api/me').then((response) => {
+            //     console.log(response)
+            // }, (error) => {
+            //     console.log(error)
+            // })
+            // if (!localStorage.getItem('token')) {
+            //
+            //     this.$router.push({name: "login"});
+            // }
 
 
         },

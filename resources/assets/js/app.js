@@ -1,9 +1,12 @@
 import Vue from 'vue'
-import router from './router'
+import {router} from './router/index'
 import App from './views/App'
 import VueResource from "vue-resource"
 import BootstrapVue from 'bootstrap-vue'
+import Vuex from 'vuex';
 window.Vue = Vue;
+
+Vue.use(Vuex);
 Vue.use(BootstrapVue)
 // Vue.use(Vuetify)
 
