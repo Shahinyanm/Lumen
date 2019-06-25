@@ -1,11 +1,14 @@
 <template>
     <div>
+
         <b-alert show variant="success" v-show="success">{{message}}</b-alert>
         <b-alert show variant="danger" v-show="failed">{{error}}</b-alert>
 
         <b-button id="show-btn " variant="dark" @click="$bvModal.show('bv-modal-example')">+</b-button>
         <b-button id="show-btn " variant="dark" @click="$bvModal.show('assign-modal')">Assign</b-button>
         <b-button id="show-btn " variant="dark" @click="$bvModal.show('owner-modal')">Set Owner</b-button>
+
+
 
         <b-table
                 striped hover
@@ -110,6 +113,7 @@
 
 <script>
     // import {logout} from '../mixins/logout'
+    import {store} from '../store/store'
     import 'bootstrap/dist/css/bootstrap.css'
     import 'bootstrap-vue/dist/bootstrap-vue.css'
 
@@ -146,9 +150,7 @@
             }
         },
         beforeCreate: function () {
-            if (!localStorage.getItem('token')) {
-                this.$router.push({name: "login"});
-            }
+
             let vm = this
             this.$http.get('api/teams').then((response) => {
                 response.body.map(function (value, key) {
@@ -165,6 +167,7 @@
                 });
             })
         },
+
         methods: {
             onReset(evt) {
                 evt.preventDefault()

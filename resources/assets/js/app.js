@@ -4,6 +4,7 @@ import App from './views/App'
 import VueResource from "vue-resource"
 import BootstrapVue from 'bootstrap-vue'
 import Vuex from 'vuex';
+import { store } from './store/store'
 window.Vue = Vue;
 
 Vue.use(Vuex);
@@ -25,6 +26,7 @@ Vue.http.interceptors.push((request, next) => {
 
 const app = new Vue({
     el: '#app',
+    store,
     components: { App },
     router,
 });
