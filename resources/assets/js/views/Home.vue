@@ -4,14 +4,14 @@
             <h5 class="section-title h1">All My TEAM</h5>
             <div class="row">
                 <!-- Team member -->
-                <div class="col-xs-12 col-sm-6 col-md-4" v-for="team in teams">
+                <div class="col-xs-12 col-sm-6 col-md-4" v-for="team in $store.getters.TEAMS">
                     <div class="image-flip" ontouchstart="this.classList.toggle('hover');">
                         <div class="mainflip">
                             <div class="frontside">
                                 <div class="card">
                                     <div class="card-body text-center">
                                         <p><img class=" img-fluid" src="http://homestead.test/default-team-logo.png" alt="card image"></p>
-                                        <h4 class="card-title">{{team.name}}</h4>
+                                        <h4 class="card-title">{{team.title}}</h4>
                                         <p class="card-text">{{team.users.length}} members in Team</p>
                                         <a href="#" class="btn btn-primary btn-sm"><i class="fa fa-plus"></i></a>
                                     </div>
@@ -22,7 +22,9 @@
                                     <div class="card-body text-center mt-4">
                                         <h4>Team Members</h4>
                                             <ul>
-                                                <li v-for="(value, key) in team.users" :key="key" >{{value.id}}: {{ value.name }} <small>( {{value.email}})</small>
+                                                <li v-for="(value, key) in team.users" :key="key"  >{{value.id}}: {{ value.name }}
+                                                    <span :class="{'badge badge-success':value.pivot.owner}"> {{value.email}}</span>
+
 
                                                 </li>
                                             </ul>
@@ -44,6 +46,8 @@
 
 <script>
     // import {logout} from '../mixins/logout'
+    import {store} from "../store/store";
+
     export default {
         // mixins: [logout],
         name: "Home",
@@ -53,32 +57,16 @@
 
             }
         },
-        beforeCreate: function () {
-            // this.$http.get('api/me').then((response) => {
-            //     console.log(response)
-            // }, (error) => {
-            //     console.log(error)
-            // })
-            // if (!localStorage.getItem('token')) {
-            //
-            //     this.$router.push({name: "login"});
-            // }
-
-
-        },
         mounted() {
             let vm = this
-            this.$http.get('api/teams').then((response) => {
+            store.commit("EMPTY_TEAMS",);
 
+            vm.$http.get('api/teams').then((response) => {
                 response.body.map(function (value, key) {
-                    vm.teams.push(value);
+                    vm.$store.commit("SET_TEAMS",value);
                 });
-
-            }, () => {
-
             })
         }
-
     }
 </script>
 

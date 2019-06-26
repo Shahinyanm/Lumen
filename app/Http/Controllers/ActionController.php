@@ -54,7 +54,7 @@ class ActionController extends Controller
 		$role = Role::findOrfail($request->role_id);
 		$role->users()->sync($user);
 
-		return response()->json('User Successfully assigned to Team', 200);
+		return response()->json(['success'=>'User Successfully assigned to Team'], 200);
 	}
 
 	public function unAssignTeam(Request $request)
@@ -82,7 +82,7 @@ class ActionController extends Controller
 
 		$role->users()->detach($user);
 
-		return response()->json('User Successfully assigned to Team', 200);
+		return response()->json(['success'=>'User Successfully assigned to Team'], 200);
 	}
 
 	public function setOwner(Request $request)
@@ -96,14 +96,14 @@ class ActionController extends Controller
 
 
 		if (!$pivot->owner) {
-			return response()->json('You can not assign users to this team, because you are not owner', 401);
+			return response()->json(['failed'=>'You can not assign users to this team, because you are not owner'], 401);
 		}
 		$old = optional($team->users->find($user->id))->pivot;
 		if (!$old || !$old->owner) {
 			$team->users()->attach($user, ['owner' => true]);
 		}
 		else {
-			return response()->json('User is already owner of this team', 200);
+			return response()->json(['success'=>'User is already owner of this team'], 200);
 
 		}
 

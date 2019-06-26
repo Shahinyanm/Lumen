@@ -6,13 +6,13 @@
 
         <b-button id="show-btn " variant="dark" @click="$bvModal.show('bv-modal-example')">+</b-button>
         <b-button id="show-btn " variant="dark" @click="$bvModal.show('assign-modal')">Assign</b-button>
-        <b-button id="show-btn " variant="dark" @click="$bvModal.show('owner-modal')">Set Owner</b-button>
+        <b-button id="show-btn " variant="dark" @click="$bvModal.show('owner_modal')">Set Owner</b-button>
 
 
 
         <b-table
                 striped hover
-                :items="teams"
+                :items="$store.getters.TEAMS"
                 :fields="fields"
         >
             <template slot="action" slot-scope="row">
@@ -32,7 +32,8 @@
             <template slot="row-details" slot-scope="row">
                 <b-card>
                     <ul>
-                        <li v-for="(value, key) in row.item.users" :key="key" class="m-3">{{value.id}}: {{ value.name }} <small>( {{value.email}})</small>
+                        <li v-for="(value, key) in row.item.users" :key="key" class="m-3">
+                            {{value.id}}: {{ value.name }} <small>( {{value.email}})   {{value.pivot.owner? '--- Owner' :''}} </small>
                             <b-button size="sm" @click="un_sign(row.item.id, value.id,$event.target)" class="ml-5 mr-5 btn-danger">
                                 X
                             </b-button>
@@ -78,28 +79,30 @@
             <b-form inline>
                 <div class="form-group">
                     <label  for="user_select">User</label>
-                    <b-form-select v-model="selected_user" :options="users" id="user_select" class="ml-3 mb-3 mr-3"></b-form-select>
+                    <b-form-select v-model="selected_user" :options="$store.getters.USERS" id="user_select" class="ml-3 mb-3 mr-3"></b-form-select>
                 </div>
                 <div class="form-group">
 
                     <label  for="team_select"> Team</label>
-                    <b-form-select v-model="selected_team" :options="team_select" id="team_select" class="mb-3 ml-3"></b-form-select>
+                    <b-form-select v-model="selected_team" :options="$store.getters.SELECT_TEAMS" id="team_select" class="mb-3 ml-3"></b-form-select>
                 </div>
 
                 <b-button variant="primary" @click="assign" class="mb-3 ml-3 mr-3">Update</b-button>
             </b-form>
 
         </b-modal>
-        <b-modal id="assign-modal" hide-footer ref="my-modal">
+
+        <b-modal id="owner_modal" hide-footer ref="my-modal">
+            Set Owner to team
             <b-form inline>
                 <div class="form-group">
                     <label  for="user_select">User</label>
-                    <b-form-select v-model="selected_user" :options="users" id="user_select" class="ml-3 mb-3 mr-3"></b-form-select>
+                    <b-form-select v-model="selected_user" :options="$store.getters.USERS" id="user_select" class="ml-3 mb-3 mr-3"></b-form-select>
                 </div>
                 <div class="form-group">
 
                     <label  for="team_select"> Team</label>
-                    <b-form-select v-model="selected_team" :options="team_select" id="team_select" class="mb-3 ml-3"></b-form-select>
+                    <b-form-select v-model="selected_team" :options="$store.getters.SELECT_TEAMS" id="team_select" class="mb-3 ml-3"></b-form-select>
                 </div>
 
                 <b-button variant="primary" @click="set_owner" class="mb-3 ml-3 mr-3">Update</b-button>
@@ -112,7 +115,6 @@
 </template>
 
 <script>
-    // import {logout} from '../mixins/logout'
     import {store} from '../store/store'
     import 'bootstrap/dist/css/bootstrap.css'
     import 'bootstrap-vue/dist/bootstrap-vue.css'
@@ -129,8 +131,6 @@
                     {key: 'action'}
 
                 ],
-                teams: [],
-                users: [],
                 form: {
                     title: '',
                 },
@@ -150,20 +150,16 @@
             }
         },
         beforeCreate: function () {
-
-            let vm = this
+            store.commit("EMPTY_TEAMS",);
             this.$http.get('api/teams').then((response) => {
                 response.body.map(function (value, key) {
-                    vm.team_select.push({value: value.id, text: value.title})
-                    vm.teams.push(value);
+                    store.commit("SET_SELECT_TEAMS",{value: value.id, text: value.title});
+                    store.commit("SET_TEAMS",value);
                 });
-            }, () => {
-
             })
-
             this.$http.get('api/users').then((response) => {
                 response.body.map(function (value, key) {
-                    vm.users.push({value: value.id, text: value.name})
+                    store.commit("SET_USERS",{value: value.id, text: value.name});
                 });
             })
         },
@@ -185,22 +181,24 @@
             },
             create() {
                 this.$http.post('api/teams', {title: this.form.title}).then((response) => {
-                    this.teams.push(response.body)
-
+                    this.$store.commit("SET_TEAMS", response.body);
                     this.hideModal()
                 }, (error) => {
                     console.log(error)
                 })
             },
             update() {
-                this.$http.put('api/teams' + '/' + this.team.id, {
-                    title: this.team.title,
-                }).then((response) => {
-                    this.teams.push(response.body)
+                let data ={
+                    id: this.team.id,
+                    title: this.team.title
+                }
+                this.$store.dispatch("UPDATE_TEAM",data).then(()=>{
                     this.hideModal()
-                }, (error) => {
-                    console.log(error)
+                    this.message="Successfully Updated";
+                    this.success= true
+
                 })
+
 
             },
             open_modal(item, index, button) {
@@ -210,34 +208,28 @@
                 this.$bvModal.show('edit_modal')
             },
             destroy(item, index, button) {
-
                 let team = JSON.parse(JSON.stringify(item, null, 2))
-                var confirm_delete = confirm('Are you sure to remove ?');
+                let confirm_delete = confirm('Are you sure to remove ?');
 
                 if (confirm_delete) {
-                    this.$http.delete('api/teams' + '/' + team.id, {
-                        title: this.team.title,
-                    }).then((response) => {
+                    this.$http.delete('api/teams' + '/' + team.id
+                    ).then((response) => {
                         if (response.status == 200) {
                             this.success = true
                             this.message = response.body.success
-                            let row = button.parentNode.parentNode;
-                            row.parentNode.removeChild(row);
+                            this.$store.dispatch("DELETE_TEAM",team.id)
                         }
                     }, (error) => {
                         if (error.status == 401) {
                             this.error = error.body.failed
                             this.failed = true
-
                         }
-
                     })
                 }
             },
             assign(){
                 this.$http.post('api/assignTeam', {team_id: this.selected_team, user_id:this.selected_user}).then((response) => {
                     this.message = response.body.success
-
                     this.success = true
                     this.hideModal()
                 }, (error) => {
@@ -247,9 +239,11 @@
                 })
             },
             un_sign(team_id, user_id,button){
-
-
-                this.$http.post('api/unAssignTeam', {team_id: team_id, user_id:user_id}).then((response) => {
+                this.$http.post('api/unAssignTeam',
+                    {
+                        team_id: team_id,
+                        user_id:user_id
+                    }).then((response) => {
                     this.message = response.body.success
                     this.success = true
                     let list = button.parentNode;
@@ -259,12 +253,14 @@
                     this.failed = true
                 })
 
-
             },
             set_owner(){
-                this.$http.post('api/setOwner', {team_id: this.selected_team, user_id:this.selected_user}).then((response) => {
+                this.$http.post('api/setOwner',
+                    {
+                        team_id: this.selected_team,
+                        user_id:this.selected_user
+                    }).then((response) => {
                     this.message = response.body.success
-
                     this.success = true
                     this.hideModal()
                 }, (error) => {
